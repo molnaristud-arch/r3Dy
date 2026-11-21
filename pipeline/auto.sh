@@ -4,8 +4,8 @@
 # Minden új adag fotó/videó kap egy saját mappát (data/modell_1, data/modell_2, …): a képek
 # átkerülnek a <mappa>/images-be (a videó a <mappa>/video-ba, és belőle a legélesebb
 # képkockák kerülnek az images-be), majd lefut a rekonstrukció, a Blender-tisztítás
-# és az előnézet. A napló: <mappa>/run.log. Ezután bekérdezi a nevet, címkéket, leírást, majd
-# publish.py → commit + push → ha a SITE be van állítva, megvárja, hogy az élő oldalon megjelenjen.
+# és az előnézet. A napló: <mappa>/run.log. Ezután a minőségellenőrző ágens (agent/qa.py, Claude)
+# nevet, leírást, címkéket javasol és ítél; egy kérdés után (Feltöltsem így? / szerkesztés) publish.py → commit + push → ha a SITE be van állítva, megvárja, hogy az élő oldalon megjelenjen.
 # Ez a fix sorrendű tartalék lánc; az ágens-vezérelt változat: agent/controller.py.
 #
 # Használat:
@@ -19,11 +19,12 @@
 #   --settle 15    ennyi másodpercig nem változhat a bejovo/, mielőtt hozzányúl (másolás vége)
 #   --no-open      a végén ne nyissa meg az előnézeti képet
 #   --no-publish   ne kérdezzen rá a feltöltésre (terminál nélkül, pl. háttérben futva, magától kimarad)
+#   --no-ai        ne kérjen AI-javaslatot (agent/qa.py), mindent kézzel kérdezzen
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
 inbox=data/bejovo
-size=0.2 frames=150 mask=0 watch=0 max=2000 settle=15 open=1 offer=1 use_ai=0
+size=0.2 frames=150 mask=0 watch=0 max=2000 settle=15 open=1 offer=1 use_ai=1
 site=${SITE:-}   # live site URL (e.g. https://example.vercel.app); empty = do not wait for deploy
 while (($#)); do
   case $1 in
@@ -35,6 +36,7 @@ while (($#)); do
     --settle) settle=$2; shift ;;
     --no-open) open=0 ;;
     --no-publish) offer=0 ;;
+    --no-ai) use_ai=0 ;;
     -h|--help) sed -n '2,/^set /p' "$0" | sed '$d; s/^# \{0,1\}//'; exit 0 ;;
     *) echo "Ismeretlen kapcsoló: $1 (súgó: --help)" >&2; exit 2 ;;
   esac
@@ -94,8 +96,21 @@ ask_edit() { local a; read -e -r -i "$2" -p "$1" a </dev/tty || a=$2; printf '%s
 is_yes() { [[ $1 =~ ^[iIyY] ]]; }
 slug() { .venv/bin/python -c 'import sys; sys.path.insert(0, "pipeline"); from publish import slug; print(slug(sys.argv[1]))' "$1"; }
 
-# AI suggestions now come from the agents (agent/); this fallback asks everything by hand.
-ai_suggest() { return 1; }
+# The AI agent's suggestion (agent/qa.py → Claude). Sets ai_*; returns 1 when it is
+# switched off or unreachable (the reason is in $dir/ai.err) – then everything is asked by hand.
+ai_suggest() {
+  local dir=$1 out f=()
+  ((use_ai)) || return 1
+  echo "AI-javaslat kérése (minőségellenőrző ágens, Claude)…"
+  out=$(.venv/bin/python agent/qa.py "$dir" 2>"$dir/ai.err") || return 1
+  mapfile -t f < <(printf '%s' "$out" | .venv/bin/python -c 'import json, sys
+d = json.load(sys.stdin)
+one = lambda s: " ".join(str(s).split())
+for v in (d["nev"], d["leiras"], " ".join(d["cimkek"]), d["minoseg"], " | ".join(d["hibak"]), d.get("model", ""), d.get("size_cm", "")):
+    print(one(v))' 2>>"$dir/ai.err")
+  [[ -n ${f[0]-} ]] || return 1
+  ai_name=${f[0]} ai_desc=${f[1]-} ai_tags=${f[2]-} ai_quality=${f[3]-} ai_issues=${f[4]-} ai_model=${f[5]-} ai_size=${f[6]-}
+}
 
 # After a successful run: AI suggestion (or questions), optional size fix, then publish, commit,
 # push and wait for the live site.

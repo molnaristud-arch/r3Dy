@@ -1,0 +1,320 @@
+<!doctype html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<title>DIsc – 3D szkennelés: használati útmutató</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+  :root { --ink: #14181F; --soft: #4A5260; --paper: #FBFAF6; --band: #EFEAE0; --accent: #A34E17; --accent2: #E8833A; --code: #F3F0E8; --line: #DDD6C8; }
+  @page { size: A4; margin: 18mm 17mm 20mm; @bottom-center { content: "DIsc · Használati útmutató · " counter(page); font: 8.5pt Inter, Arial, sans-serif; color: #8A8F98; } }
+  @page :first { margin: 0; @bottom-center { content: none; } }
+  * { box-sizing: border-box; }
+  html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body { margin: 0; font: 9.6pt/1.45 Inter, Arial, sans-serif; color: var(--ink); background: #fff; }
+  h1, h2, h3 { font-family: 'Space Grotesk', Arial, sans-serif; line-height: 1.15; margin: 0; }
+  h2 { font-size: 17pt; margin: 0 0 8pt; padding-top: 2pt; break-after: avoid; }
+  h2 .n { color: var(--accent); margin-right: 6pt; }
+  h3 { font-size: 11.5pt; margin: 12pt 0 4pt; break-after: avoid; }
+  p { margin: 0 0 6pt; }
+  ul, ol { margin: 0 0 8pt; padding-left: 16pt; }
+  li { margin: 0 0 2.5pt; }
+  section { margin-bottom: 14pt; }
+  .page { break-before: page; }
+  code, pre { font-variant-ligatures: none; font-feature-settings: "liga" 0, "calt" 0; }
+  code { font: 8.6pt 'JetBrains Mono', 'Courier New', monospace; background: var(--code); padding: 0.5pt 3pt; border-radius: 3pt; }
+  pre { font: 8.4pt/1.45 'JetBrains Mono', 'Courier New', monospace; background: var(--code); border-left: 3pt solid var(--accent2); padding: 7pt 9pt; margin: 4pt 0 9pt; white-space: pre-wrap; break-inside: avoid; border-radius: 0 4pt 4pt 0; }
+  pre .c { color: #7A7F87; }
+  pre .ok { color: #2F7D4A; font-weight: 600; }
+  pre .ask { color: #2D5FB0; }
+  table { width: 100%; border-collapse: collapse; margin: 4pt 0 10pt; font-size: 9pt; break-inside: avoid; }
+  th { text-align: left; background: var(--band); font-weight: 600; padding: 4pt 6pt; }
+  td { padding: 4pt 6pt; border-bottom: 0.6pt solid var(--line); vertical-align: top; }
+  .note { background: var(--band); border-radius: 5pt; padding: 7pt 10pt; margin: 6pt 0 10pt; break-inside: avoid; }
+  .note b:first-child { color: var(--accent); }
+  .warn { border-left: 3pt solid #B3261E; background: #FBEDEC; border-radius: 0 5pt 5pt 0; padding: 7pt 10pt; margin: 6pt 0 10pt; break-inside: avoid; }
+  .steps { counter-reset: s; list-style: none; padding-left: 0; }
+  .steps > li { counter-increment: s; position: relative; padding-left: 22pt; margin-bottom: 5pt; }
+  .steps > li::before { content: counter(s); position: absolute; left: 0; top: 0; width: 15pt; height: 15pt; border-radius: 50%; background: var(--accent2); color: #fff; font: 600 8.5pt/15pt Inter, sans-serif; text-align: center; }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 12pt; }
+  .flow { display: flex; align-items: stretch; gap: 4pt; margin: 6pt 0 10pt; }
+  .flow div { flex: 1; background: var(--band); border-radius: 5pt; padding: 6pt 7pt; font-size: 8.6pt; line-height: 1.35; }
+  .flow b { display: block; font-family: 'Space Grotesk', sans-serif; font-size: 9.5pt; color: var(--accent); margin-bottom: 2pt; }
+  .flow span { align-self: center; color: var(--accent2); font-weight: 700; }
+  .toc { columns: 2; column-gap: 24pt; padding-left: 16pt; margin-top: 8pt; }
+  .toc li { break-inside: avoid; }
+  /* cover */
+  .cover { height: 297mm; display: flex; flex-direction: column; justify-content: space-between; background: var(--ink); color: #F4F1EA; margin: 0; padding: 38mm 24mm 28mm; }
+  .cover .eyebrow { font: 600 10pt Inter, sans-serif; letter-spacing: 2pt; color: var(--accent2); }
+  .cover h1 { font-size: 40pt; margin: 8pt 0 10pt; }
+  .cover .lead { font-size: 13pt; color: #B4BFCC; max-width: 140mm; }
+  .cover .meta { font-size: 10pt; color: #B4BFCC; }
+  .cover .meta b { color: #F4F1EA; }
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <div>
+    <p class="eyebrow">DIsc · HACKATHON 2026</p>
+    <h1>3D szkennelés<br>AI ágensekkel</h1>
+    <p class="lead">Használati útmutató: a tárgy lefotózásától a weboldalon forgatható, AR-ben megnézhető, letölthető 3D modellig.</p>
+  </div>
+  <div class="meta">
+    <p><b>Kozma Dávid · Molnár István</b></p>
+    <p>Repó: github.com/molnaristud-arch/r3Dy (privát)</p>
+    <p>Kapcsolódó leírások a repóban: <b>MUKODES.md</b> (elmélet, működés) · <b>TESZT.md</b> (teljes teszt) · <b>TERV.md</b> (terv) · <b>presentation/</b> (demó)</p>
+  </div>
+</div>
+
+<section class="page">
+<h2>Tartalom</h2>
+<ol class="toc">
+  <li>Mit csinál a rendszer?</li>
+  <li>Amire szükség van</li>
+  <li>Első telepítés (egyszer)</li>
+  <li>A forgóasztal és a tárgy előkészítése</li>
+  <li>A telefon beállítása</li>
+  <li>Felvétel: kézzel, motorral vagy videóval</li>
+  <li>Feldolgozás: a vezérlő ágens</li>
+  <li>Minőségellenőrzés és feltöltés</li>
+  <li>A weboldal használata</li>
+  <li>Kézi vezérlés (haladó)</li>
+  <li>Hibaelhárítás</li>
+  <li>Karbantartás</li>
+  <li>Gyors összefoglaló a demó napjára</li>
+</ol>
+
+<h2 style="margin-top:14pt"><span class="n">1</span>Mit csinál a rendszer?</h2>
+<p>Egy tárgyat egy forgóasztalon körbefotózunk, a fotókból a laptop <b>fotogrammetriával</b> kiszámolja a tárgy textúrázott, valódi méretű 3D modelljét. A folyamatot egy <b>AI ágens vezérli</b>: minden lépés után dönt, a hibákat javítja, egy második ágens ellenőrzi a végeredményt, és a modell felkerül a weboldalra.</p>
+<div class="flow">
+  <div><b>Felvétel</b>forgóasztal + telefon: 72 fotó vagy egy videó</div><span>→</span>
+  <div><b>Bemásolás</b>USB-n a laptop <code>data/bejovo/</code> mappájába</div><span>→</span>
+  <div><b>Feldolgozás</b>a vezérlő ágens futtatja és javítja: COLMAP, OpenMVS, Blender (10–20 perc)</div><span>→</span>
+  <div><b>Ellenőrzés</b>minőségellenőrző ágens: ítélet, név, leírás, címkék</div><span>→</span>
+  <div><b>Weboldal</b>forgatható 3D, AR, GLB/.blend letöltés</div>
+</div>
+<p>A modellt nem egy AI „találja ki”: a fotókból <b>mérjük</b>, ezért hű a valódi tárgyhoz. Hogy ez hogyan működik, a <code>MUKODES.md</code> írja le részletesen.</p>
+
+<h2 style="margin-top:12pt"><span class="n">2</span>Amire szükség van</h2>
+<div class="two">
+<div>
+<h3>Hardver</h3>
+<ul>
+  <li><b>Laptop</b> Linuxszal (Ubuntu 24.04+) vagy Windowson WSL2-vel, <b>NVIDIA videokártyával</b> (CUDA), 16 GB RAM ajánlott.</li>
+  <li><b>Android telefon</b> az ingyenes <b>Open Camera</b> alkalmazással, USB-kábel.</li>
+  <li><b>Forgóasztal:</b> tányér vagy forgótálca, vagy egy áram nélküli PC-ventilátor mint csapágy.</li>
+  <li><b>Nyomtatott korong</b> (<code>capture/disc_a4.svg</code>), fehér háttér (karton), egyenletes fény.</li>
+  <li><i>Opcionális:</i> Arduino Uno/Nano, 28BYJ-48 léptetőmotor ULN2003 panellel, piezo zümmer, nyomógomb.</li>
+</ul>
+</div>
+<div>
+<h3>Szoftver (a telepítés feltelepíti)</h3>
+<ul>
+  <li>COLMAP 4.2 és OpenMVS 2.4 (CUDA) – a 3D számítás.</li>
+  <li>Blender – tisztítás, méretezés, GLB-export.</li>
+  <li>Python-környezet (OpenCV, rembg) – videó, háttérkivágás.</li>
+  <li>Git – a feltöltés a weboldalra egy <code>git push</code>.</li>
+  <li><i>Opcionális:</i> Arduino IDE a motorhoz.</li>
+</ul>
+<p>Az ágensekhez <b>Claude API-kulcs</b> kell (console.anthropic.com), a repó gyökerében lévő <code>.env</code> fájlban: <code>ANTHROPIC_API_KEY=sk-ant-…</code>. A <code>.env</code> nincs a gitben – a kulcsot kézzel kell átadni.</p>
+</div>
+</div>
+</section>
+
+<section class="page">
+<h2><span class="n">3</span>Első telepítés (egyszer)</h2>
+<p>Egy friss klónban minden benne van a futtatáshoz (kód, tesztképek), kivéve az API-kulcsot; a gépfüggő környezetet a <code>setup.sh</code> építi fel.</p>
+<pre><span class="c"># 1. a repó letöltése</span>
+git clone git@github.com:molnaristud-arch/r3Dy.git
+cd r3Dy
+
+<span class="c"># 2. rendszercsomagok és a micromamba (egyszer)</span>
+sudo apt install -y ffmpeg blender python3-venv git curl
+curl -sSfL https://micro.mamba.pm/api/micromamba/linux-64/latest | tar -xj -C ~/.local bin/micromamba
+
+<span class="c"># 3. a környezet felépítése (első alkalommal néhány perc, utána ~30 s)</span>
+./setup.sh
+
+<span class="c"># 4. Claude API-kulcs (a .env git-ignorált)</span>
+echo 'ANTHROPIC_API_KEY=sk-ant-…' &gt; .env</pre>
+<p>Elvárt vége: <code>COLMAP 4.2.1 … with CUDA</code>, <code>OpenMVS x64 v2.4.0</code>, <code>Blender …</code>, <code>onnxruntime ['TensorrtExecutionProvider', 'CUDAExecutionProvider']</code> és <b><code>setup ok</code></b>. Ha valami hiányzik, a szkript kiírja a telepítő parancsot.</p>
+
+<h3>Próbafutás a mellékelt tesztképekkel</h3>
+<pre>mkdir -p data/teszt/images &amp;&amp; cp data/sample/images/*.jpg data/teszt/images/
+.venv/bin/python agent/controller.py data/teszt --size 0.3
+<span class="ok">[kész] KÉSZ (kb. 5 perc, 8 lépés)</span>
+rm -rf data/teszt</pre>
+<div class="warn"><b>A tesztképek (egy kastélyhomlokzat) AGPL-licencűek:</b> a belőlük készült modellt ne töltsd fel a weboldalra – ezért fut a próba <code>--publish</code> nélkül (az ágens amúgy is tiltja).</div>
+
+<h3>Windows: WSL2</h3>
+<ol>
+  <li>PowerShellben rendszergazdaként: <code>wsl --install -d Ubuntu-24.04</code>, majd újraindítás.</li>
+  <li>Az Ubuntu-ablakban a fenti lépések. A Windows NVIDIA-illesztőprogramja a WSL-nek is adja a CUDA-t – a WSL-ben ne telepíts külön drivert.</li>
+  <li>A repót a WSL saját fájlrendszerébe klónozd (<code>~/</code>), ne a <code>/mnt/c</code> alá.</li>
+</ol>
+
+<h2 style="margin-top:12pt"><span class="n">4</span>A forgóasztal és a tárgy előkészítése</h2>
+<ol class="steps">
+  <li><b>Korong:</b> nyomtasd ki a <code>capture/disc_a4.svg</code>-t <b>100 %-os („tényleges”) méretben</b>; a lap alján lévő skála vonalzóval mérve pontosan 5 cm legyen. Nagyobb tárgyhoz: <code>disc_a3.svg</code>.</li>
+  <li><b>Alap:</b> ragaszd a korongot a tányérra, forgótálcára vagy a ventilátorra. Az asztalra a korong mellé tegyél egy szalagot: ez a fix jel a forgatáshoz.</li>
+  <li><b>Tárgy:</b> matt és mintás, 10–25 cm-es (cipő, plüss, festett figura, kő, fa). Kerüld: üveg, fém, fényes műanyag, egyszínű fehér tárgy, vékony szálak. Tedd a szaggatott kör közepére, és <b>mérd le a leghosszabb méretét</b>.</li>
+  <li><b>Háttér: egyszínű</b> (fehér karton vagy üres fal). Ez fontos: a háttér áll, a tárgy forog – egy mintás háttér összezavarja a programot.</li>
+  <li><b>Fény:</b> egyenletes, kemény árnyék nélkül (ablak felőli nappali fény vagy két lámpa két oldalról).</li>
+</ol>
+</section>
+
+<section class="page">
+<h2><span class="n">5</span>A telefon beállítása (Open Camera)</h2>
+<table>
+  <tr><th style="width:32%">beállítás</th><th>érték</th><th style="width:34%">miért</th></tr>
+  <tr><td>Felbontás</td><td>a legnagyobb; formátum <b>JPG</b> (nem HEIC)</td><td>a HEIC-et a szkript nem veszi észre</td></tr>
+  <tr><td>Fókusz</td><td>koppints a tárgyra, majd mód: <b>Locked</b></td><td>minden kép ugyanúgy éles</td></tr>
+  <tr><td>Expozíció</td><td><b>AE lock</b> (zárolt)</td><td>egyforma fényerő</td></tr>
+  <tr><td>Fehéregyensúly</td><td>fix, pl. <b>Daylight</b></td><td>egyforma színek a textúrán</td></tr>
+  <tr><td>HDR, vaku</td><td><b>ki</b></td><td>a feldolgozott képek torzítanak</td></tr>
+  <tr><td>Hangvezérlés (csak motorhoz)</td><td>Beállítások → Távvezérlés → Hangvezérlés → <b>Zaj</b>; a képernyőn koppints a mikrofon ikonra</td><td>a motor sípszavára exponál</td></tr>
+</table>
+<p>A telefont támaszd meg kb. 40–50 cm-re; a tárgy töltse ki a kép felét, a korong mintája is látsszon. <b>Egy körön belül ne mozdítsd el</b>, és ne váltogasd az álló/fekvő tájolást: a program a képek „fel” irányából állítja függőlegesbe a modellt.</p>
+
+<h2 style="margin-top:12pt"><span class="n">6</span>Felvétel: három lehetőség</h2>
+<p>Mindhárom esetben <b>két kör</b> kell: egy alacsonyról (kb. 20°-kal a tárgy fölül) és egy magasabbról (kb. 45°).</p>
+
+<h3>A) Kézi léptetés – a legbiztosabb</h3>
+<p>Fotó → a tányért a következő 10°-os jelig forgatod → fotó … körönként <b>36 kép</b>, összesen 72. A kezed exponáláskor ne legyen a képen (a hangerőgomb is exponál). Kb. 4 perc körönként.</p>
+
+<h3>B) Arduino léptetőmotor – kéz nélkül</h3>
+<div class="two">
+<div>
+<p><b>Bekötés:</b></p>
+<pre>ULN2003 IN1–IN4 → D8–D11
+ULN2003 + / -   → 5V / GND
+zümmer          → D7 és GND
+gomb            → D2 és GND</pre>
+<p><b>Feltöltés:</b> Arduino IDE → <code>capture/turntable_stepper/turntable_stepper.ino</code> → Board: Uno/Nano → Upload. Serial Monitor: 115200 baud, „Newline”.</p>
+</div>
+<div>
+<table>
+  <tr><th>parancs</th><th>hatás</th></tr>
+  <tr><td><code>s</code> / gomb</td><td>36 megállás 10°-onként, mindegyiknél sípszó → a telefon exponál (~2 perc/kör)</td></tr>
+  <tr><td><code>c</code></td><td>folyamatos forgás (videóhoz), <code>r1.0</code> = RPM</td></tr>
+  <tr><td><code>x</code> / gomb</td><td>stop</td></tr>
+  <tr><td><code>n36</code> <code>d2500</code> <code>b0</code> <code>?</code></td><td>megállások · állásidő (ms) · sípszó ki (<code>b1</code>: be) · állapot</td></tr>
+</table>
+</div>
+</div>
+<p>Kör végén <code>KESZ</code>: emeld meg a telefont, és indítsd újra. 300 g fölötti tárgynál a tányér súlyát egy csapágy (pl. az áram nélküli ventilátor) vigye, a motor csak forgasson.</p>
+
+<h3>C) Videó – a leggyorsabb</h3>
+<p>Videó módban, zárolt fókusszal és expozícióval; a tányér <b>lassan, folyamatosan</b> forog: <b>kb. 1 fordulat/perc</b> (kézzel vagy a motor <code>c</code> parancsával). Egy videóban két kör: a kettő között emeld meg a telefont, a felvétel mehet tovább. Gyorsabb forgásnál a képek elmosódnak – egy 300 RPM-es ventilátor motornak ezért nem jó.</p>
+</section>
+
+<section class="page">
+<h2><span class="n">7</span>Feldolgozás: a vezérlő ágens</h2>
+<p>Másold a fotókat (vagy a videót) USB-n – a telefonon „Fájlátvitel” mód, <code>DCIM/OpenCamera</code> – a <b><code>data/bejovo/</code></b> mappába, majd indítsd az ágenst (a <code>--size</code> a tárgy leghosszabb mérete <b>méterben</b>):</p>
+<pre>cd ~/r3Dy            <span class="c"># vagy ahová klónoztad</span>
+.venv/bin/python agent/controller.py --inbox --size 0.24</pre>
+<p>Az ágens a képeket egy új <code>data/modell_N</code> mappába teszi, majd lépésről lépésre végigmegy a láncon. <b>Minden lépés után az eredményből dönt</b> – hány kép illeszkedett, milyen hiba jött, hogy néz ki a modell –, és ha kell, javít:</p>
+<pre>[vezérlő]   Döntés: 72 fotó van, indulhat a rekonstrukció 2000 px-en.
+[eszköz]    reconstruct({"max_image_size": 2000})
+[eredmény]  reconstruct → {"ok": true, "total_images": 72, "registered_images": 51, …}
+[vezérlő]   Döntés: csak 51/72 kép illeszkedett, a háttér zavarhat → háttérkivágás, újra.
+[eszköz]    mask_background({})
+…
+[eszköz]    quality_check({})
+[eredmény]  quality_check → {"nev": "Fehér sportcipő", "minoseg": "jo", …}
+<span class="ok">[kész]      KÉSZ (12 perc 30 s, 11 lépés)</span></pre>
+<p>72 fotónál a futás becslés szerint <b>8–20 perc</b>; közben a laptop legyen töltőn, a böngésző zárva.</p>
+<table>
+  <tr><th style="width:26%">kapcsoló</th><th>hatás</th></tr>
+  <tr><td><code>--inbox</code></td><td>a <code>data/bejovo/</code> tartalmából új <code>data/modell_N</code> (helyette megadható egy meglévő mappa)</td></tr>
+  <tr><td><code>--size 0.24</code></td><td>a tárgy leghosszabb mérete méterben (nélküle 0.2, és az ágens jelzi)</td></tr>
+  <tr><td><code>--publish</code></td><td>engedélyezi a feltöltést a weboldalra (nélküle semmi nem kerül fel)</td></tr>
+  <tr><td><code>--max-steps 30</code></td><td>legfeljebb ennyi eszközhívás</td></tr>
+  <tr><td><code>--model</code> · <code>--effort</code></td><td>Claude-modell (alap: claude-opus-5-5) és gondolkodási szint (alap: high)</td></tr>
+</table>
+<div class="note"><b>Napló:</b> az ágens döntései a <code>data/modell_N/agent_log.jsonl</code>-ben, az eszközök teljes kimenete az <code>agent_run.log</code>-ban. <b>Tartalék</b> ágens nélkül (pl. nincs internet): <code>./pipeline/auto.sh --watch --size 0.24 --no-ai</code> – ugyanaz a lánc, fix sorrendben.</div>
+</section>
+
+<section class="page">
+<h2><span class="n">8</span>Minőségellenőrzés és feltöltés</h2>
+<p>A modell elkészülte után egy <b>második, független ágens</b> (minőségellenőrző) megnézi az előnézeti képeket és egy eredeti fotót, és JSON-ban ítél:</p>
+<pre>{"nev": "Fehér sportcipő",
+ "leiras": "Fehér, bőr hatású sportcipő szürke talppal és fűzővel.",
+ "cimkek": ["cipő", "ruházat"], "minoseg": "jo", "hibak": [], "javaslat": ""}</pre>
+<p><b>Minőség:</b> <b>jo</b> – mehet; <b>gyanus</b> – felismerhető, de hibás részekkel (lyuk, foltos textúra, tapadt háttér, dől) – a vezérlő megpróbálja javítani; <b>hibas</b> – érdemes újrafotózni. A hiányzó alj és a talp alatti korongdarab normális.</p>
+<p>Ha a futás <code>--publish</code>-sel indult, a vezérlő a jó modellt feltölti: a weboldal mappájába másolja, commitol és pushol (a Vercel ~20 s alatt élesít). Ha nem, később ugyanarra a mappára:</p>
+<pre>.venv/bin/python agent/controller.py data/modell_1 --size 0.24 --publish</pre>
+<div class="note"><b>Tartalék lánc:</b> az <code>auto.sh</code> a végén ugyanettől az ágenstől kér javaslatot, és megkérdezi: <code>Feltöltsem így? [I/n, s = szerkesztés]</code> – Enter: feltöltés; n: nem; s: méret, név, címkék, leírás szerkesztése. Ha az AI nem érhető el, kézzel kérdez.</div>
+
+<h2 style="margin-top:12pt"><span class="n">9</span>A weboldal használata</h2>
+<p>A Vercel-címen nyilvános, bárki megnyithatja; helyben: <code>cd web &amp;&amp; python3 -m http.server 8000</code>.</p>
+<ul>
+  <li><b>Kártyák:</b> minden modell forgatható (egér / ujj), nagyítható, magától lassan forog; alatta név, valódi méret, háromszögszám, leírás, címkék.</li>
+  <li><b>Keresés:</b> név, leírás vagy címke szerint.</li>
+  <li><b>AR:</b> telefonon a modellen megjelenő gombbal a tárgy <b>valódi méretben</b> a szobába helyezhető (Androidon és iPhone-on is).</li>
+  <li><b>Letöltés:</b> „GLB letöltése” – bármely 3D programba, játékmotorba (Unity, Unreal, Godot) importálható; „.blend” – Blenderben szerkeszthető.</li>
+  <li><b>Blenderben:</b> File → Import → glTF 2.0 – a modell méterben, valódi méretben, a talpa az origóban áll.</li>
+</ul>
+<p>Ha frissítés után a régi oldal látszik: <b>Ctrl+Shift+R</b>.</p>
+</section>
+
+<section class="page">
+<h2><span class="n">10</span>Kézi vezérlés (haladó)</h2>
+<p>Az ágens eszközei ezeket a lépéseket hívják – külön is futtathatók, pl. egy lépés megismétléséhez. Egy eszköz API nélkül: <code>.venv/bin/python agent/tools.py data/cipo reconstruct '{"max_image_size": 1600}'</code>.</p>
+<pre><span class="c"># fotók: data/cipo/images/   (videóból: .venv/bin/python pipeline/extract_frames.py video.mp4 data/cipo/images --count 150)</span>
+.venv/bin/python pipeline/mask.py data/cipo/images data/cipo/masked      <span class="c"># opcionális háttérkivágás</span>
+./pipeline/reconstruct.sh data/cipo                                       <span class="c"># → data/cipo/model/model.obj</span>
+./blender/run.sh cleanup data/cipo/model/model.obj data/cipo/model.glb --size 0.28 --blend
+./blender/run.sh preview data/cipo/model.glb data/cipo/preview
+.venv/bin/python agent/qa.py data/cipo                                    <span class="c"># minőségellenőrző ágens, JSON</span>
+.venv/bin/python pipeline/publish.py data/cipo/model.glb --name "Sportcipő" --tags cipő --description "…"
+git add web/models &amp;&amp; git commit -m "Add: sportcipő" &amp;&amp; git push         <span class="c"># élesítés ~20 s</span></pre>
+<p><b>Csak a méret rossz?</b> Elég a Blender-lépést újrafuttatni más <code>--size</code>-zal, majd újra feltölteni ugyanazzal a névvel.</p>
+
+<h2 style="margin-top:12pt"><span class="n">11</span>Hibaelhárítás</h2>
+<table>
+  <tr><th style="width:31%">mit látsz</th><th style="width:29%">ok</th><th>teendő</th></tr>
+  <tr><td><code>"error_category": "registration_failed"</code></td><td>a képek nem illeszthetők össze</td><td>egyszínű háttér, több fény, látsszon a korong mintája; újrafuttatás: <code>./pipeline/reconstruct.sh data/modell_N</code></td></tr>
+  <tr><td>kusza „felhő”, rajta a háttér</td><td>mintázott háttér</td><td>fehér háttér előtt újra – vagy az ágens maszkol</td></tr>
+  <tr><td>a modell ferde vagy fejjel lefelé áll</td><td>a telefon tájolása kör közben változott</td><td>újrafotózás egy tájolásban</td></tr>
+  <tr><td><code>cuda_oom</code></td><td>kevés videomemória</td><td>az ágens kisebb képmérettel próbálja</td></tr>
+  <tr><td>egy oldalon lyukas</td><td>onnan kevés kép</td><td>egy harmadik kör más magasságból</td></tr>
+  <tr><td><code>[hiba] … ANTHROPIC_API_KEY</code></td><td>nincs vagy rossz a kulcs</td><td><code>.env</code>: <code>ANTHROPIC_API_KEY=sk-ant-…</code></td></tr>
+  <tr><td><code>[hiba] Nincs kapcsolat az API-val</code></td><td>nincs internet</td><td>tartalék: <code>./pipeline/auto.sh --no-ai</code></td></tr>
+  <tr><td><code>"pushed": false</code></td><td>hálózat vagy git-jogosultság</td><td>a commit helyben megvan: később <code>git push</code></td></tr>
+  <tr><td>a motor zúg, de nem forog</td><td>rossz tekercssorrend</td><td>IN1–IN4 pontosan D8–D11-re</td></tr>
+  <tr><td>a telefon nem exponál a sípszóra</td><td>hangvezérlés ki / halk</td><td>mikrofon ikon be, érzékenység fel, zümmer közelebb; vagy <code>d6000</code> és kézi exponálás</td></tr>
+</table>
+<p><b>Ha semmi sem áll össze:</b> a tárgy álljon egy helyben, és te sétálj körülötte (~40 fotó). Ha így működik, a forgóasztal vagy a háttér a gond, nem a szoftver.</p>
+</section>
+
+<section class="page">
+<h2><span class="n">12</span>Karbantartás</h2>
+<h3>Modell levétele az oldalról</h3>
+<p>Töröld a bejegyzését a <code>web/models/models.json</code>-ból és a <code>web/models/&lt;név&gt;.glb</code> / <code>.blend</code> fájlt, majd <code>git commit -am "Remove: &lt;név&gt;" &amp;&amp; git push</code>.</p>
+<h3>Az ágensek</h3>
+<ul>
+  <li><b>API-kulcs:</b> a <code>.env</code>-ben (<code>ANTHROPIC_API_KEY</code>); csere: új kulcs a console.anthropic.com-on, a régi visszavonása.</li>
+  <li><b>Viselkedés hangolása:</b> a vezérlő döntési támpontjai az <code>agent/controller.py</code> <code>SYSTEM_PROMPT</code>-jában, a minőségellenőrző utasítása az <code>agent/qa.py</code> <code>PROMPT</code>-jában.</li>
+  <li><b>Költség:</b> egy szkennelés jellemzően néhány tized dollár (a képek miatt).</li>
+</ul>
+<h3>Prezentáció</h3>
+<p><code>presentation/prezentacio.pdf</code> (vetítéshez), <code>presentation/prezentacio.html</code> (böngészőben: ← → lapoz, F teljes képernyő, N jegyzetek). Újragenerálás a diák módosítása után: <code>python3 presentation/build.py --pdf</code>.</p>
+<h3>Ez az útmutató</h3>
+<p>Forrás: <code>docs/howto/HowToUse.html</code>; PDF újragenerálása: <code>./docs/howto/build.sh</code> → <code>HowToUse.pdf</code>.</p>
+
+<h2 style="margin-top:12pt"><span class="n">13</span>Gyors összefoglaló a demó napjára</h2>
+<ol class="steps">
+  <li>Laptop töltőn, böngésző zárva, <code>./setup.sh</code> → <code>setup ok</code>.</li>
+  <li>Forgóasztal: korong középen, fehér háttér, egyenletes fény, a tárgy lemérve.</li>
+  <li>Telefon: Open Camera, minden zárolva, JPG, (motorhoz) hangvezérlés be.</li>
+  <li>Két kör fotó (kézzel, <code>s</code> paranccsal vagy videóval) → bemásolás a <code>data/bejovo/</code>-ba.</li>
+  <li><code>.venv/bin/python agent/controller.py --inbox --size &lt;méret m&gt; --publish</code></li>
+  <li>Amíg számol (10–20 perc): az ágens döntéseinek kommentálása, a korábbi modellek bemutatása, AR telefonon.</li>
+  <li><code>[kész] KÉSZ</code> → frissítés az oldalon: ott az új modell.</li>
+</ol>
+<div class="note"><b>B terv:</b> 2–3 előre beszkennelt modell legyen fent az oldalon. Ha az élő szkennelés elakad, azokkal is bemutatható minden, az <code>agent_log.jsonl</code> pedig megmutatja, hol tart a feldolgozás.</div>
+</section>
+
+</body>
+</html>

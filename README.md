@@ -27,13 +27,22 @@ echo 'ANTHROPIC_API_KEY=...' > .env   # Claude API-kulcs; a .env git-ignorált
 
 A `--publish` nélkül az ágens nem tölt fel semmit. A `data/sample` tesztkészlet AGPL-licencű: belőle készült modellt nem szabad közzétenni (az ágens ezt ellenőrzi).
 
+## Dokumentáció
+
+- [TERV.md](TERV.md) – terv, döntések, ütemterv
+- [MUKODES.md](MUKODES.md) – elmélet és a lánc működése lépésről lépésre
+- [TESZT.md](TESZT.md) – teljes teszt elvárt kimenetekkel
+- [HowToUse.pdf](HowToUse.pdf) – használati útmutató (forrás: `docs/howto/`)
+- [presentation/prezentacio.pdf](presentation/prezentacio.pdf) – demóprezentáció (forrás: `presentation/`, `build.py --pdf`)
+
 ## Felépítés
 
 ```
-agent/       controller.py (vezérlő ágens), tools.py (az eszközei)
+agent/       controller.py (vezérlő ágens), tools.py (az eszközei), qa.py (minőségellenőrző ágens)
 pipeline/    extract_frames, mask, reconstruct.sh, publish, auto.sh (tartalék lánc)
 blender/     run.sh, cleanup.py, preview.py
 capture/     nyomtatható korong (SVG), léptetőmotor (Arduino)
 web/         statikus weboldal (model-viewer) + models/
+presentation/ demóprezentáció · docs/howto/ az útmutató forrása
 data/        szkennelések (git-ignorált), kivéve data/sample
 ```

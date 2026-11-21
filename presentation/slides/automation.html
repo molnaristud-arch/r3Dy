@@ -1,0 +1,24 @@
+<section id="automation" class="dark">
+<p class="eyebrow">AI ágensek</p>
+<h2>Nem szkript futtatja – egy ágens dönt</h2>
+<div style="display:flex; gap:64px; align-items:flex-start">
+<div class="term rise" style="--i:0; width:1060px; box-sizing:border-box">
+<p class="cmd">$ agent/controller.py --inbox --size 0.24</p>
+<p>reconstruct → 71/96 kép regisztrálva</p>
+<p class="ask">Döntés: a kiesett képeken mintás a háttér → háttérkivágás, újra.</p>
+<p>mask_background → reconstruct → 94/96 ✓</p>
+<p>cleanup_model → render_preview</p>
+<p>quality_check → GYANÚS: dől kb. 15°-ot</p>
+<p class="ask">Döntés: más tájolással tisztítom újra.</p>
+<p>cleanup_model(up_axis=Y) → quality_check → JÓ ✓</p>
+<p class="ok">publish_model → git push → ÉLES</p>
+</div>
+<div style="flex:1; display:flex; flex-direction:column; gap:32px">
+<div class="rise" style="--i:2"><h3>Vezérlő ágens</h3><p class="body">Claude Opus 5.5: a lánc lépései az eszközei, minden lépés után az eredményből dönt.</p></div>
+<div class="rise" style="--i:3"><h3>Minőségellenőrző ágens</h3><p class="body">Független második vélemény: az előnézetet a valódi fotóval veti össze.</p></div>
+<div class="rise" style="--i:4"><h3>Önjavító kör</h3><p class="body">Hibát észlel, javít, újra ellenőriz – korlátos számú próbálkozással.</p></div>
+<div class="rise" style="--i:5"><h3>Átlátható</h3><p class="body">Minden döntés és indoklás élőben látszik, és naplóba kerül.</p></div>
+</div>
+</div>
+<aside>A láncot nem egy fix sorrendű szkript futtatja, hanem egy AI ágens. A fotogrammetria lépései az eszközei; minden lépés után megkapja az eredményt – hány kép illeszkedett, milyen hiba jött, hogy néz ki a modell –, és ő dönti el, mi legyen a következő lépés. Egy második, független ágens ellenőrzi a végeredményt a valódi fotóval összevetve. Ha hibát talál, a vezérlő javít és újra ellenőriztet. Minden döntés indoklással együtt látszik.</aside>
+</section>

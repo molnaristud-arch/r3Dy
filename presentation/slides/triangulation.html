@@ -1,0 +1,30 @@
+<section id="triangulation" class="dark">
+<p class="eyebrow">Elmélet · 1</p>
+<h2>Mélység két nézőpontból</h2>
+<div style="display:flex; gap:64px; align-items:center; flex:1">
+<div class="rise" style="--i:0; width:640px; display:flex; flex-direction:column; gap:32px">
+<p class="lead">Egy fotón a mélység elvész: egy pixelhez a térben egy egész sugár tartozik.</p>
+<p class="body">Ha ugyanazt a pontot két helyről is látjuk, a két sugár metszése kijelöli a helyét. Sok fotó, sok ezer pont: a program egyszerre számolja ki a kamerák helyét és a tárgy alakját.</p>
+</div>
+<div class="diagram rise" style="--i:2; width:960px; height:600px">
+<svg aria-label="Két kamera ugyanazt a tárgypontot látja; a két látósugár a pontban metszi egymást" width="960" height="600" viewBox="0 0 960 600" xmlns="http://www.w3.org/2000/svg">
+<rect x="380" y="100" width="200" height="170" rx="24" fill="#1F2632" stroke="#B4BFCC" stroke-width="2"/>
+<line x1="165" y1="460" x2="440" y2="150" stroke="#B4BFCC" stroke-width="3" stroke-dasharray="10 8"/>
+<line x1="795" y1="460" x2="440" y2="150" stroke="#B4BFCC" stroke-width="3" stroke-dasharray="10 8"/>
+<line x1="110" y1="400" x2="250" y2="400" stroke="#F4F1EA" stroke-width="4"/>
+<line x1="680" y1="400" x2="820" y2="400" stroke="#F4F1EA" stroke-width="4"/>
+<circle cx="218" cy="400" r="9" fill="#5B9BF0"/>
+<circle cx="726" cy="400" r="9" fill="#5B9BF0"/>
+<rect x="110" y="460" width="110" height="72" rx="10" fill="#5B9BF0"/>
+<rect x="740" y="460" width="110" height="72" rx="10" fill="#5B9BF0"/>
+<circle cx="440" cy="150" r="14" fill="#E8833A"/>
+</svg>
+<p style="left:470px; top:40px; width:420px">X – a tárgy egy pontja</p>
+<p style="left:100px; top:548px; width:200px">1. fotó</p>
+<p style="left:730px; top:548px; width:200px">2. fotó</p>
+<p style="left:236px; top:352px; width:200px">képpont 1</p>
+<p style="left:560px; top:352px; width:150px">képpont 2</p>
+</div>
+</div>
+<aside>Ez ugyanaz, amivel a két szemünk mélységet érzékel. A fotogrammetria ezt csinálja nagyban: a program minden fotón több ezer jellegzetes pontot keres (SIFT), párosítja őket a képek között, és ebből egyszerre számolja ki, honnan készült az egyes kép, és hol vannak a pontok a térben (Structure from Motion). Fontos: képekből csak arányok jönnek ki – a valódi méretet mi adjuk meg.</aside>
+</section>

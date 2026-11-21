@@ -1,0 +1,40 @@
+<section id="pipeline" class="dark">
+<p class="eyebrow">Megvalósítás</p>
+<h2>A lánc: négy eszköz, egy parancs</h2>
+<div class="flow" style="flex:1">
+<div class="card rise" style="--i:0">
+<p class="tool">COLMAP</p>
+<h3>Hol volt a kamera?</h3>
+<p>Jellemzőpontok (SIFT)</p>
+<p>Párosítás + RANSAC</p>
+<p>Kamerapozíciók (SfM)</p>
+<p>Függőleges igazítás</p>
+</div>
+<div class="arrow"><x-shape kind="arrow-right"></x-shape></div>
+<div class="card rise" style="--i:1">
+<p class="tool">OpenMVS</p>
+<h3>Milyen a felület?</h3>
+<p>Sűrű pontfelhő (PatchMatch)</p>
+<p>Háló (Delaunay + gráfvágás)</p>
+<p>Textúra a fotókból</p>
+</div>
+<div class="arrow"><x-shape kind="arrow-right"></x-shape></div>
+<div class="card rise" style="--i:2">
+<p class="tool">Blender</p>
+<h3>Kész asset</h3>
+<p>Törmelék le, 50 000 háromszög</p>
+<p>Valódi méret, talp az origóban</p>
+<p>GLB + .blend, előnézet</p>
+</div>
+<div class="arrow"><x-shape kind="arrow-right"></x-shape></div>
+<div class="card rise" style="--i:3">
+<p class="tool">Web</p>
+<h3>Közzététel</h3>
+<p>models.json + git push</p>
+<p>Vercel élesít ~20 s alatt</p>
+<p>model-viewer: 3D, AR, letöltés</p>
+</div>
+</div>
+<p class="body" style="margin-top:32px">Mind ingyenes, nyílt forrású eszköz; a számítás a laptop GPU-ján fut (RTX 2060, CUDA).</p>
+<aside>Négy eszköz egymás után. A COLMAP kitalálja, honnan készült minden fotó. Az OpenMVS ebből minden pixelnek mélységet számol, felületet húz rá, és rátölti a fotók színét. A Blender rendbe teszi: levágja a törmeléket, egyszerűsít, valódi méretre skáláz, és GLB-be exportál. A végén a modell a weboldalra kerül. Mindezt egyetlen szkript vezérli.</aside>
+</section>

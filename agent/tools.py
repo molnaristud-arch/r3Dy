@@ -95,6 +95,13 @@ TOOL_SCHEMAS = [
         "input_schema": _schema({}),
     },
     {
+        "name": "quality_check",
+        "description": "Független minőségellenőrző ágens (külön Claude-hívás): az előnézetek és egy eredeti fotó alapján "
+                       "ítéletet ad (jo / gyanus / hibas), felsorolja a hibákat, javaslatot tesz, és megírja a modell "
+                       "nevét, leírását, címkéit a weboldalhoz. render_preview után hívd; publish_model előtt kötelező.",
+        "input_schema": _schema({}),
+    },
+    {
         "name": "publish_model",
         "description": "A kész GLB feltöltése a weboldalra (web/models + models.json), commit és push. "
                        "Csak akkor hívd, ha az előnézet alapján a modell rendben van. Ha a futás nem engedélyezi "
@@ -306,6 +313,17 @@ def render_preview(scan: Scan) -> tuple[dict, list[dict]]:
     return {"ok": True, "views": [v.name for v in views], "seconds": t}, blocks
 
 
+def quality_check(scan: Scan) -> dict:
+    from qa import assess  # needs the API key; the controller has loaded it
+
+    try:
+        res = assess(scan.dir)
+    except RuntimeError as e:
+        raise ToolError(str(e))
+    (scan.dir / "qa.json").write_text(json.dumps(res, ensure_ascii=False, indent=2))
+    return res
+
+
 def publish_model(scan: Scan, name: str, tags: list[str], description: str) -> dict:
     if not scan.allow_publish:
         return {"ok": False, "published": False,
@@ -337,6 +355,7 @@ IMPLS = {
     "reconstruct": reconstruct,
     "cleanup_model": cleanup_model,
     "render_preview": render_preview,
+    "quality_check": quality_check,
     "publish_model": publish_model,
 }
 

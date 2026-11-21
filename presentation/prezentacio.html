@@ -1,0 +1,440 @@
+<!doctype html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fotóból 3D – hackathon demó</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400..700&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&amp;display=swap">
+<style>
+:root {
+  --dark: #14181F;
+  --dark2: #1F2632;
+  --paper: #F4F1EA;
+  --paper2: #E7E1D3;
+  --accent: #E8833A;
+  --accent-ink: #A34E17;
+  --blue: #5B9BF0;
+  --soft-on-dark: #B4BFCC;
+  --soft-on-light: #4A5260;
+  --term: #0D1015;
+}
+
+body { font-family: 'Inter', Arial, sans-serif; }
+
+section {
+  padding: 128px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+}
+section.dark { background: var(--dark); color: var(--paper); }
+section.light { background: var(--paper); color: var(--dark); }
+section.accent { background: var(--accent); color: var(--dark); }
+
+h1, h2, h3 { font-family: 'Space Grotesk', Arial, sans-serif; margin: 0; }
+h1 { font-size: 120px; font-weight: 700; line-height: 1.02; }
+h2 { font-size: 72px; font-weight: 600; line-height: 1.08; margin-bottom: 56px; }
+h3 { font-size: 32px; font-weight: 600; line-height: 1.2; }
+p { margin: 0; }
+
+.eyebrow { font-size: 24px; font-weight: 600; letter-spacing: 4px; text-transform: uppercase; margin-bottom: 24px; color: var(--accent); }
+.light .eyebrow { color: var(--accent-ink); }
+.accent .eyebrow { color: var(--dark); }
+
+.lead { font-size: 32px; line-height: 1.4; }
+.dark .lead { color: var(--soft-on-dark); }
+.light .lead { color: var(--soft-on-light); }
+.body { font-size: 24px; line-height: 1.45; }
+.dark .body { color: var(--soft-on-dark); }
+.light .body { color: var(--soft-on-light); }
+
+.cards { display: grid; gap: 32px; }
+.cols-2 { grid-template-columns: 1fr 1fr; }
+.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+.cols-4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+.card { border-radius: 16px; padding: 40px; display: flex; flex-direction: column; gap: 16px; }
+.dark .card { background: var(--dark2); }
+.light .card { background: var(--paper2); }
+.card .step { font-family: 'Space Grotesk', Arial, sans-serif; font-size: 44px; font-weight: 700; color: var(--accent); }
+.light .card .step { color: var(--accent-ink); }
+.card .big { font-family: 'Space Grotesk', Arial, sans-serif; font-size: 72px; font-weight: 700; line-height: 1.05; color: var(--accent); }
+.light .card .big { color: var(--accent-ink); }
+
+.rise { animation: rise 600ms cubic-bezier(.2,.7,.2,1) both; animation-delay: calc(var(--i, 0) * 120ms); }
+@keyframes rise { from { opacity: 0; transform: translateY(24px); } }
+
+.term { background: var(--term); border-radius: 16px; padding: 40px 48px; display: flex; flex-direction: column; gap: 6px; }
+.term p { font-family: 'JetBrains Mono', 'Courier New', monospace; font-size: 24px; line-height: 1.5; color: #D6DEE8; }
+.term .cmd { color: var(--accent); }
+.term .ok { color: #7FD69B; }
+.term .ask { color: var(--blue); }
+
+.mono { font-family: 'JetBrains Mono', 'Courier New', monospace; }
+
+.flow { display: grid; grid-template-columns: 1fr 56px 1fr 56px 1fr 56px 1fr; align-items: stretch; }
+.flow .arrow { display: flex; align-items: center; justify-content: center; }
+.flow x-shape { width: 36px; height: 20px; background: var(--accent); }
+.flow .card { gap: 12px; }
+.flow .card p { font-size: 24px; line-height: 1.4; color: var(--soft-on-dark); }
+.flow .card .tool { font-size: 24px; font-weight: 600; letter-spacing: 3px; text-transform: uppercase; color: var(--accent); }
+
+.cycle { display: flex; align-items: center; gap: 16px; margin-top: 48px; }
+.cycle .pill { font-size: 24px; font-weight: 600; padding: 16px 24px; border-radius: 999px; background: var(--paper2); color: var(--dark); white-space: nowrap; }
+.cycle .pill.hot { background: var(--accent); color: var(--dark); }
+.cycle x-shape { width: 32px; height: 16px; background: var(--soft-on-light); }
+
+.diagram { position: relative; }
+.diagram p { position: absolute; font-size: 24px; line-height: 1.3; }
+.dark .diagram p { color: var(--paper); }
+
+table.plain { width: 100%; font-size: 28px; color: var(--dark); }
+table.plain th { font-weight: 600; text-align: left; }
+table.plain tr.head { background: var(--paper2); }
+
+/* --- standalone player --- */
+html, body { margin: 0; height: 100%; background: #0B0D11; overflow: hidden; }
+#stage { position: absolute; left: 50%; top: 50%; width: 1920px; height: 1080px; transform-origin: 0 0; }
+#stage > section { position: absolute; inset: 0; width: 1920px; height: 1080px; overflow: hidden; display: none; }
+#stage > section.on { display: flex; }
+section aside { display: none; }
+body.notes section.on aside { display: block; position: absolute; left: 0; right: 0; bottom: 0; padding: 24px 128px;
+  background: rgba(10,12,16,.92); color: #E8ECF1; font: 24px/1.45 Inter, Arial, sans-serif; }
+.xarrow { display: block; }
+.flow .xarrow { color: var(--accent); }
+.cycle .xarrow { color: var(--soft-on-light); width: 32px; height: 18px; }
+.xicon { display: block; }
+table.plain { border-collapse: collapse; }
+table.plain td, table.plain th { padding: .5em .6em; border-bottom: 2px solid #0002; text-align: left; vertical-align: top; }
+#count { position: fixed; right: 16px; bottom: 12px; color: #8891; font: 14px Inter, Arial, sans-serif; }
+@media print {
+  @page { size: 1920px 1080px; margin: 0; }
+  html, body { height: auto; overflow: visible; background: none; }
+  #stage { position: static; transform: none !important; width: auto; height: auto; }
+  #stage > section { position: relative; display: flex !important; break-after: page; }
+  .rise { animation: none !important; }
+  #count { display: none; }
+}
+</style>
+</head>
+<body>
+<div id="stage">
+<section id="cover" class="dark" style="justify-content:space-between">
+<div>
+<p class="eyebrow rise" style="--i:0; text-transform:none">DIsc · Hackathon 2026</p>
+<h1 class="rise" style="--i:1; max-width:1500px">Fotóból 3D modell – percek alatt</h1>
+</div>
+<div class="rise" style="--i:3">
+<p class="lead" style="max-width:1300px">Barkácsolt forgóasztal, egy telefon, fotogrammetria – és AI ágensek, amelyek vezérlik, ellenőrzik és javítják a folyamatot.</p>
+<p class="body" style="margin-top:32px">Kozma Dávid · Molnár István</p>
+</div>
+<aside>Nyitás: egy mondatban mit csinálunk – egy valódi tárgyról néhány perc alatt kész, letölthető, AR-ben is megnézhető 3D modell, kézi modellezés nélkül. A végén élőben is megmutatjuk.</aside>
+</section>
+<section id="problem" class="light" style="justify-content:center">
+<p class="eyebrow">A probléma</p>
+<h1 class="rise" style="--i:0; font-size:96px; max-width:1500px">Egy valódi tárgy 3D modellje ma órák kézi modellezése – vagy egy drága szkenner.</h1>
+<p class="lead rise" style="--i:2; margin-top:56px; max-width:1300px">Mi egy telefonnal, egy barkácsolt forgóasztallal és ingyenes, nyílt forrású szoftverekkel csináljuk meg – kézi modellezés nélkül.</p>
+<aside>Aki próbált már valódi tárgyat 3D-ben megjeleníteni (játékhoz, webshophoz, AR-hez), tudja: vagy órákig modellezi Blenderben, vagy szkennert vesz. Mi a kettő között: a mérést a fényképek végzik.</aside>
+</section>
+<section id="solution" class="dark">
+<p class="eyebrow">A megoldás</p>
+<h2>Fotózás, számítás, közzététel</h2>
+<div class="cards cols-3" style="flex:1">
+<div class="card rise" style="--i:0">
+<p class="step">1</p>
+<h3>Fotózás</h3>
+<p class="body">A tárgy forgóasztalon forog, a telefon 10°-onként fotóz. Két kör két magasságból: 72 kép.</p>
+</div>
+<div class="card rise" style="--i:1">
+<p class="step">2</p>
+<h3>Számítás</h3>
+<p class="body">A laptop GPU-ja a fotókból kiszámolja a kamerák helyét, a felületet és a textúrát. Egy AI ágens vezérli és javítja.</p>
+</div>
+<div class="card rise" style="--i:2">
+<p class="step">3</p>
+<h3>Közzététel</h3>
+<p class="body">Egy kérdés, és a modell kint van a weben: forgatható, AR-ben a szobába tehető, GLB-ben letölthető.</p>
+</div>
+</div>
+<aside>Három lépés. A középső a lényeg: fotogrammetria. Nem AI generálja a modellt, hanem a fotókból méri ki – ezért hű a valódi tárgyhoz.</aside>
+</section>
+<section id="hardware" class="light">
+<p class="eyebrow">Hardver</p>
+<h2>Egy barkácsolt forgóasztal, ami magától fotóztat</h2>
+<div class="cards cols-4">
+<div class="card rise" style="--i:0">
+<h3>Nyomtatott korong</h3>
+<p class="body">10°-os beosztás és véletlen minta: kapaszkodó a programnak.</p>
+</div>
+<div class="card rise" style="--i:1">
+<h3>Ventilátor mint csapágy</h3>
+<p class="body">Áram nélküli PC-ventilátor: sima, stabil forgás.</p>
+</div>
+<div class="card rise" style="--i:2">
+<h3>Arduino + léptető</h3>
+<p class="body">28BYJ-48 motor: pontosan 10°-ot fordul, megáll, sípol.</p>
+</div>
+<div class="card rise" style="--i:3">
+<h3>Telefon</h3>
+<p class="body">Open Camera: a sípszóra exponál. Nincs kábel a telefonig.</p>
+</div>
+</div>
+<div class="cycle rise" style="--i:5">
+<p class="pill">10° fordulat</p>
+<svg class="xarrow" width="36" height="20" viewBox="0 0 36 20" aria-hidden="true"><path d="M0 6h22V0l14 10-14 10v-6H0z" fill="currentColor"/></svg>
+<p class="pill">0,6 s nyugalom</p>
+<svg class="xarrow" width="36" height="20" viewBox="0 0 36 20" aria-hidden="true"><path d="M0 6h22V0l14 10-14 10v-6H0z" fill="currentColor"/></svg>
+<p class="pill hot">sípszó → fotó</p>
+<svg class="xarrow" width="36" height="20" viewBox="0 0 36 20" aria-hidden="true"><path d="M0 6h22V0l14 10-14 10v-6H0z" fill="currentColor"/></svg>
+<p class="pill">2,5 s állás</p>
+<svg class="xarrow" width="36" height="20" viewBox="0 0 36 20" aria-hidden="true"><path d="M0 6h22V0l14 10-14 10v-6H0z" fill="currentColor"/></svg>
+<p class="pill">36× = egy kör, ~2 perc</p>
+</div>
+<aside>A korong mintája együtt forog a tárggyal, és rengeteg felismerhető pontot ad. A ventilátor motornak nem jó (300 RPM-en elmosódna minden), de áram nélkül kiváló csapágy. Az Arduino lépteti a motort, és minden megállásnál sípol – az Open Camera hangvezérlése erre készít fotót. Egy kör 36 fotóval kb. 2 perc, kéz nélkül.</aside>
+</section>
+<section id="triangulation" class="dark">
+<p class="eyebrow">Elmélet · 1</p>
+<h2>Mélység két nézőpontból</h2>
+<div style="display:flex; gap:64px; align-items:center; flex:1">
+<div class="rise" style="--i:0; width:640px; display:flex; flex-direction:column; gap:32px">
+<p class="lead">Egy fotón a mélység elvész: egy pixelhez a térben egy egész sugár tartozik.</p>
+<p class="body">Ha ugyanazt a pontot két helyről is látjuk, a két sugár metszése kijelöli a helyét. Sok fotó, sok ezer pont: a program egyszerre számolja ki a kamerák helyét és a tárgy alakját.</p>
+</div>
+<div class="diagram rise" style="--i:2; width:960px; height:600px">
+<svg aria-label="Két kamera ugyanazt a tárgypontot látja; a két látósugár a pontban metszi egymást" width="960" height="600" viewBox="0 0 960 600" xmlns="http://www.w3.org/2000/svg">
+<rect x="380" y="100" width="200" height="170" rx="24" fill="#1F2632" stroke="#B4BFCC" stroke-width="2"/>
+<line x1="165" y1="460" x2="440" y2="150" stroke="#B4BFCC" stroke-width="3" stroke-dasharray="10 8"/>
+<line x1="795" y1="460" x2="440" y2="150" stroke="#B4BFCC" stroke-width="3" stroke-dasharray="10 8"/>
+<line x1="110" y1="400" x2="250" y2="400" stroke="#F4F1EA" stroke-width="4"/>
+<line x1="680" y1="400" x2="820" y2="400" stroke="#F4F1EA" stroke-width="4"/>
+<circle cx="218" cy="400" r="9" fill="#5B9BF0"/>
+<circle cx="726" cy="400" r="9" fill="#5B9BF0"/>
+<rect x="110" y="460" width="110" height="72" rx="10" fill="#5B9BF0"/>
+<rect x="740" y="460" width="110" height="72" rx="10" fill="#5B9BF0"/>
+<circle cx="440" cy="150" r="14" fill="#E8833A"/>
+</svg>
+<p style="left:470px; top:40px; width:420px">X – a tárgy egy pontja</p>
+<p style="left:100px; top:548px; width:200px">1. fotó</p>
+<p style="left:730px; top:548px; width:200px">2. fotó</p>
+<p style="left:236px; top:352px; width:200px">képpont 1</p>
+<p style="left:560px; top:352px; width:150px">képpont 2</p>
+</div>
+</div>
+<aside>Ez ugyanaz, amivel a két szemünk mélységet érzékel. A fotogrammetria ezt csinálja nagyban: a program minden fotón több ezer jellegzetes pontot keres (SIFT), párosítja őket a képek között, és ebből egyszerre számolja ki, honnan készült az egyes kép, és hol vannak a pontok a térben (Structure from Motion). Fontos: képekből csak arányok jönnek ki – a valódi méretet mi adjuk meg.</aside>
+</section>
+<section id="turntable" class="light">
+<p class="eyebrow">Elmélet · 2</p>
+<h2>A forgóasztal-trükk</h2>
+<div class="cards cols-2" style="gap:64px">
+<div class="rise" style="--i:0; display:flex; flex-direction:column; gap:16px">
+<svg aria-label="Felülnézet: nyolc kamera kering egy álló tárgy körül" width="760" height="360" viewBox="0 0 760 360" xmlns="http://www.w3.org/2000/svg">
+<circle cx="380" cy="180" r="140" fill="none" stroke="#4A5260" stroke-width="2" stroke-dasharray="8 8"/>
+<rect x="352" y="152" width="56" height="56" rx="6" fill="#E8833A"/>
+<rect x="-17" y="-12" width="34" height="24" rx="4" fill="#5B9BF0" transform="translate(520 180) rotate(90)"/>
+<rect x="-17" y="-12" width="34" height="24" rx="4" fill="#5B9BF0" transform="translate(479 279) rotate(135)"/>
+<rect x="-17" y="-12" width="34" height="24" rx="4" fill="#5B9BF0" transform="translate(380 320) rotate(180)"/>
+<rect x="-17" y="-12" width="34" height="24" rx="4" fill="#5B9BF0" transform="translate(281 279) rotate(225)"/>
+<rect x="-17" y="-12" width="34" height="24" rx="4" fill="#5B9BF0" transform="translate(240 180) rotate(270)"/>
+<rect x="-17" y="-12" width="34" height="24" rx="4" fill="#5B9BF0" transform="translate(281 81) rotate(315)"/>
+<rect x="-17" y="-12" width="34" height="24" rx="4" fill="#5B9BF0" transform="translate(380 40)"/>
+<rect x="-17" y="-12" width="34" height="24" rx="4" fill="#5B9BF0" transform="translate(479 81) rotate(45)"/>
+</svg>
+<p class="body">Klasszikus: a kamera körbejárja az álló tárgyat.</p>
+</div>
+<div class="rise" style="--i:1; display:flex; flex-direction:column; gap:16px">
+<svg aria-label="Felülnézet: egy álló kamera, alatta a mintás korongon forgó tárgy" width="760" height="360" viewBox="0 0 760 360" xmlns="http://www.w3.org/2000/svg">
+<line x1="380" y1="38" x2="290" y2="110" stroke="#4A5260" stroke-width="2" stroke-dasharray="6 6"/>
+<line x1="380" y1="38" x2="470" y2="110" stroke="#4A5260" stroke-width="2" stroke-dasharray="6 6"/>
+<circle cx="380" cy="190" r="130" fill="#E7E1D3" stroke="#4A5260" stroke-width="2"/>
+<circle cx="300" cy="120" r="6" fill="#14181F"/><circle cx="330" cy="100" r="5" fill="#4A5260"/>
+<circle cx="425" cy="105" r="6" fill="#14181F"/><circle cx="455" cy="130" r="5" fill="#4A5260"/>
+<circle cx="470" cy="172" r="7" fill="#14181F"/><circle cx="462" cy="230" r="5" fill="#4A5260"/>
+<circle cx="430" cy="262" r="6" fill="#14181F"/><circle cx="380" cy="282" r="5" fill="#4A5260"/>
+<circle cx="330" cy="268" r="7" fill="#14181F"/><circle cx="295" cy="240" r="5" fill="#4A5260"/>
+<circle cx="280" cy="195" r="6" fill="#14181F"/><circle cx="292" cy="152" r="5" fill="#4A5260"/>
+<circle cx="405" cy="242" r="5" fill="#14181F"/><circle cx="350" cy="238" r="5" fill="#4A5260"/>
+<circle cx="425" cy="150" r="5" fill="#14181F"/>
+<rect x="352" y="162" width="56" height="56" rx="6" fill="#E8833A"/>
+<rect x="363" y="14" width="34" height="24" rx="4" fill="#5B9BF0"/>
+<path d="M530 245 A160 160 0 0 1 230 245" fill="none" stroke="#A34E17" stroke-width="4"/>
+<polygon points="224.5,230 240.8,245.4 222,252.2" fill="#A34E17"/>
+</svg>
+<p class="body">Nálunk: a kamera áll, a tárgy forog. A tárgyhoz képest ugyanaz.</p>
+</div>
+</div>
+<div class="card rise" style="--i:3; margin-top:24px; padding:32px 40px; border-left:8px solid var(--accent-ink)">
+<h3>Feltétel: minden, ami látszik, együtt forog a tárggyal</h3>
+<p class="body">Ezért egyszínű a háttér: egy álló, mintás háttér azt „mondaná”, hogy a kamera nem mozdult. A korong mintája viszont együtt forog, és kapaszkodót ad.</p>
+</div>
+<aside>A klasszikus fotogrammetriában a fotós körbejárja a tárgyat. Mi megfordítjuk: a kamera áll, a tárgy forog – a tárgyhoz képest ez pontosan ugyanaz. Egy feltétellel: a képen ne legyen semmi álló és mintás, mert az ellentmondana. Ezért fehér a háttér, és ezért van a tárgy alatt a mintás korong: az együtt forog vele, és rengeteg pontot ad.</aside>
+</section>
+<section id="pipeline" class="dark">
+<p class="eyebrow">Megvalósítás</p>
+<h2>A lánc: négy eszköz, egy parancs</h2>
+<div class="flow" style="flex:1">
+<div class="card rise" style="--i:0">
+<p class="tool">COLMAP</p>
+<h3>Hol volt a kamera?</h3>
+<p>Jellemzőpontok (SIFT)</p>
+<p>Párosítás + RANSAC</p>
+<p>Kamerapozíciók (SfM)</p>
+<p>Függőleges igazítás</p>
+</div>
+<div class="arrow"><svg class="xarrow" width="36" height="20" viewBox="0 0 36 20" aria-hidden="true"><path d="M0 6h22V0l14 10-14 10v-6H0z" fill="currentColor"/></svg></div>
+<div class="card rise" style="--i:1">
+<p class="tool">OpenMVS</p>
+<h3>Milyen a felület?</h3>
+<p>Sűrű pontfelhő (PatchMatch)</p>
+<p>Háló (Delaunay + gráfvágás)</p>
+<p>Textúra a fotókból</p>
+</div>
+<div class="arrow"><svg class="xarrow" width="36" height="20" viewBox="0 0 36 20" aria-hidden="true"><path d="M0 6h22V0l14 10-14 10v-6H0z" fill="currentColor"/></svg></div>
+<div class="card rise" style="--i:2">
+<p class="tool">Blender</p>
+<h3>Kész asset</h3>
+<p>Törmelék le, 50 000 háromszög</p>
+<p>Valódi méret, talp az origóban</p>
+<p>GLB + .blend, előnézet</p>
+</div>
+<div class="arrow"><svg class="xarrow" width="36" height="20" viewBox="0 0 36 20" aria-hidden="true"><path d="M0 6h22V0l14 10-14 10v-6H0z" fill="currentColor"/></svg></div>
+<div class="card rise" style="--i:3">
+<p class="tool">Web</p>
+<h3>Közzététel</h3>
+<p>models.json + git push</p>
+<p>Vercel élesít ~20 s alatt</p>
+<p>model-viewer: 3D, AR, letöltés</p>
+</div>
+</div>
+<p class="body" style="margin-top:32px">Mind ingyenes, nyílt forrású eszköz; a számítás a laptop GPU-ján fut (RTX 2060, CUDA).</p>
+<aside>Négy eszköz egymás után. A COLMAP kitalálja, honnan készült minden fotó. Az OpenMVS ebből minden pixelnek mélységet számol, felületet húz rá, és rátölti a fotók színét. A Blender rendbe teszi: levágja a törmeléket, egyszerűsít, valódi méretre skáláz, és GLB-be exportál. A végén a modell a weboldalra kerül. Mindezt egyetlen szkript vezérli.</aside>
+</section>
+<section id="automation" class="dark">
+<p class="eyebrow">AI ágensek</p>
+<h2>Nem szkript futtatja – egy ágens dönt</h2>
+<div style="display:flex; gap:64px; align-items:flex-start">
+<div class="term rise" style="--i:0; width:1060px; box-sizing:border-box">
+<p class="cmd">$ agent/controller.py --inbox --size 0.24</p>
+<p>reconstruct → 71/96 kép regisztrálva</p>
+<p class="ask">Döntés: a kiesett képeken mintás a háttér → háttérkivágás, újra.</p>
+<p>mask_background → reconstruct → 94/96 ✓</p>
+<p>cleanup_model → render_preview</p>
+<p>quality_check → GYANÚS: dől kb. 15°-ot</p>
+<p class="ask">Döntés: más tájolással tisztítom újra.</p>
+<p>cleanup_model(up_axis=Y) → quality_check → JÓ ✓</p>
+<p class="ok">publish_model → git push → ÉLES</p>
+</div>
+<div style="flex:1; display:flex; flex-direction:column; gap:32px">
+<div class="rise" style="--i:2"><h3>Vezérlő ágens</h3><p class="body">Claude Opus 5.5: a lánc lépései az eszközei, minden lépés után az eredményből dönt.</p></div>
+<div class="rise" style="--i:3"><h3>Minőségellenőrző ágens</h3><p class="body">Független második vélemény: az előnézetet a valódi fotóval veti össze.</p></div>
+<div class="rise" style="--i:4"><h3>Önjavító kör</h3><p class="body">Hibát észlel, javít, újra ellenőriz – korlátos számú próbálkozással.</p></div>
+<div class="rise" style="--i:5"><h3>Átlátható</h3><p class="body">Minden döntés és indoklás élőben látszik, és naplóba kerül.</p></div>
+</div>
+</div>
+<aside>A láncot nem egy fix sorrendű szkript futtatja, hanem egy AI ágens. A fotogrammetria lépései az eszközei; minden lépés után megkapja az eredményt – hány kép illeszkedett, milyen hiba jött, hogy néz ki a modell –, és ő dönti el, mi legyen a következő lépés. Egy második, független ágens ellenőrzi a végeredményt a valódi fotóval összevetve. Ha hibát talál, a vezérlő javít és újra ellenőriztet. Minden döntés indoklással együtt látszik.</aside>
+</section>
+<section id="numbers" class="light">
+<p class="eyebrow">Számok</p>
+<h2>Mennyi idő?</h2>
+<div class="cards cols-2">
+<div class="card rise" style="--i:0">
+<p class="big">~1 perc 10 s</p>
+<p class="body">A teljes lánc 11 fotóból – mérve, nyilvános mintakészleten.</p>
+</div>
+<div class="card rise" style="--i:1">
+<p class="big">[__] perc</p>
+<p class="body">72 fotós valódi szkennelés – a becslés 8–20 perc.</p>
+</div>
+<div class="card rise" style="--i:2">
+<p class="big">~2 perc</p>
+<p class="body">Egy kör 36 fotóval a motoros forgóasztalon – szimulálva.</p>
+</div>
+<div class="card rise" style="--i:3">
+<p class="big">33 s</p>
+<p class="body">Egy perces 4K videóból 150 éles képkocka – mérve.</p>
+</div>
+</div>
+<aside>A mintán a teljes lánc kb. 1 perc 10 másodperc. Valódi tárgyon, 72 fotóval – ide írjuk be a hackathonon mért időt. A motoros kör kb. 2 perc, a videóból kivágás egy perces 4K felvételnél 33 másodperc.</aside>
+</section>
+<section id="demo" class="accent" style="justify-content:center">
+<p class="eyebrow">Élő demó</p>
+<h1 class="rise" style="--i:0">Fotó → 3D → web</h1>
+<div style="display:flex; flex-direction:column; gap:20px; margin-top:56px">
+<p class="lead rise" style="--i:2">1 · A motor körbeforgatja a tárgyat, a telefon minden sípszóra fotóz.</p>
+<p class="lead rise" style="--i:3">2 · A képek a laptopra kerülnek – a vezérlő ágens dolgozik, a döntései élőben látszanak.</p>
+<p class="lead rise" style="--i:4">3 · A kész modell megjelenik az oldalon:</p>
+</div>
+<p class="mono rise" style="--i:5; font-size:44px; font-weight:600; margin-top:40px">[weboldal címe]</p>
+<aside>Itt váltunk az élő bemutatóra. Amíg a lánc számol (néhány perc), megmutatjuk az oldalon a korábban beszkennelt modelleket: forgatás, AR telefonon, letöltés. B terv, ha valami elakad: a már kész modellek az oldalon, és a run.log, hogy hol tart a feldolgozás.</aside>
+</section>
+<section id="limits" class="light">
+<p class="eyebrow">Őszintén</p>
+<h2>Amit (még) nem tud</h2>
+<table class="plain rise" style="--i:0">
+<tr class="head"><th style="width:30%">Korlát</th><th style="width:38%">Oka</th><th style="width:32%">Megoldás</th></tr>
+<tr><td>Fényes vagy átlátszó tárgy</td><td>A tükröződés nézőpontonként vándorol</td><td>Matt tárgy választása</td></tr>
+<tr><td>Hiányzik a tárgy alja</td><td>Alulról egy fotó sem látta</td><td>Megfordítva is lefotózni</td></tr>
+<tr><td>Mintás háttér elrontja</td><td>Nem forog együtt a tárggyal</td><td>Egyszínű háttér vagy --mask</td></tr>
+<tr><td>A méretet kézzel adjuk meg</td><td>Fotókból csak arány számolható</td><td>Ismert méretű jelölő (tervben)</td></tr>
+<tr><td>A motor csak könnyű tárgyat bír</td><td>A tengelye nem csapágy</td><td>A súlyt a ventilátor-csapágy viszi</td></tr>
+</table>
+<aside>Minden korlátnak elméleti oka van, és ezeket tudatosan vállaltuk. A fényes és átlátszó tárgy a fotogrammetria klasszikus gyengéje. Az alj azért hiányzik, mert alulról nem fotóztunk. A méretet egyelőre egy mérés alapján adjuk meg – ezt egy ismert méretű jelölővel lehet automatizálni.</aside>
+</section>
+<section id="next" class="dark">
+<p class="eyebrow">Állapot és továbblépés</p>
+<h2>Ami kész, és ami jön</h2>
+<div class="cards cols-3" style="flex:1">
+<div class="card rise" style="--i:0; border:2px solid #E8833A">
+<svg class="xicon" style="width:56px; height:56px; color:#E8833A" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
+<h3>Vezérlő + minőségellenőrző ágens – kész</h3>
+<p class="body">Önjavító kör: hibát észlel, javít, újra ellenőriz, és megírja a modell nevét, leírását, címkéit.</p>
+</div>
+<div class="card rise" style="--i:1">
+<svg class="xicon" style="width:56px; height:56px; color:#E8833A" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
+<h3>Fotózási segítő ágens</h3>
+<p class="body">Fotózás közben szól: melyik kép elmosódott, melyik szögből kell még kép.</p>
+</div>
+<div class="card rise" style="--i:2">
+<svg class="xicon" style="width:56px; height:56px; color:#E8833A" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.7 6.3a4 4 0 0 0 5 5L21 13l-8 8-3-3 8-8-1.3-1.3a4 4 0 0 1-5-5L13 2l1.7 1.7z"/><path d="M3 21l6-6"/></svg>
+<h3>Blender ágens</h3>
+<p class="body">Kódot ír a javításokhoz, és a korong skálájából magától méretez.</p>
+</div>
+</div>
+<aside>A vezérlő és a minőségellenőrző ágens már működik: a lánc magától javítja a tipikus hibákat, és a végén a modell nevét, leírását, címkéit is megírja. A következő két ágens: a fotózási segítő, amely már felvétel közben szól, ha valami hiányzik, és a Blender ágens, amely kódot ír a javításokhoz, és a korong 5 cm-es skálájából kézi mérés nélkül méretez.</aside>
+</section>
+<section id="thanks" class="dark" style="justify-content:space-between">
+<div>
+<p class="eyebrow" style="text-transform:none">DIsc csapat</p>
+<h1 class="rise" style="--i:0">Köszönjük!</h1>
+<p class="lead rise" style="--i:1; margin-top:32px">Kérdések?</p>
+</div>
+<div class="rise" style="--i:3; display:flex; flex-direction:column; gap:16px">
+<p class="mono" style="font-size:44px; font-weight:600; color:#E8833A">[weboldal címe]</p>
+<p class="body">Nézd meg a modelleket, forgasd, tedd a szobádba AR-ben. · Kozma Dávid · Molnár István</p>
+</div>
+<aside>Köszönjük a figyelmet. Az oldal nyilvános, bárki megnézheti a modelleket telefonon is, AR-ben.</aside>
+</section>
+</div>
+<div id="count"></div>
+<script>
+const s = [...document.querySelectorAll('#stage > section')], stage = document.getElementById('stage');
+let i = Math.max(0, Math.min(s.length - 1, (parseInt(location.hash.slice(7)) || 1) - 1));
+function fit() { const k = Math.min(innerWidth / 1920, innerHeight / 1080);
+  stage.style.transform = `scale(${k}) translate(-50%, -50%)`; }
+function show(n) { i = Math.max(0, Math.min(s.length - 1, n));
+  s.forEach((x, j) => x.classList.toggle('on', j === i));
+  document.getElementById('count').textContent = (i + 1) + ' / ' + s.length;
+  history.replaceState(null, '', '#slide-' + (i + 1)); }
+addEventListener('resize', fit);
+addEventListener('keydown', e => {
+  if (['ArrowRight', 'PageDown', ' ', 'Enter'].includes(e.key)) show(i + 1);
+  else if (['ArrowLeft', 'PageUp', 'Backspace'].includes(e.key)) show(i - 1);
+  else if (e.key === 'Home') show(0); else if (e.key === 'End') show(s.length - 1);
+  else if (e.key === 'n' || e.key === 'N') document.body.classList.toggle('notes');
+  else if (e.key === 'f' || e.key === 'F') document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen();
+});
+addEventListener('click', e => show(e.clientX > innerWidth / 3 ? i + 1 : i - 1));
+fit(); show(i);
+</script>
+</body>
+</html>

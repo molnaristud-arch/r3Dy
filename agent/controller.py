@@ -35,14 +35,15 @@ from tools import IMAGE_EXT, ROOT, TOOL_SCHEMAS, VIDEO_EXT, Scan, ToolError, exe
 DEFAULT_MODEL = "claude-opus-5-5"
 # Per-tool attempt caps: the agent may retry, but never loop forever on the slow steps.
 MAX_CALLS = {"reconstruct": 4, "mask_background": 2, "extract_frames": 2, "cleanup_model": 5,
-             "render_preview": 6, "publish_model": 2}
+             "render_preview": 6, "quality_check": 4, "publish_model": 2}
 
 SYSTEM_PROMPT = """\
 Te egy 3D-szkennelő rendszer vezérlő ágense vagy. Egy forgóasztalon körbefotózott tárgy képeiből \
 kell textúrázott, rendbe tett 3D modellt (GLB) készítened, és ha engedélyezett, feltöltened a weboldalra.
 
 Az eszközeid a feldolgozási lánc lépései. A szokásos sorrend:
-scan_info → (extract_frames, ha videó van) → reconstruct → cleanup_model → render_preview → publish_model → finish.
+scan_info → (extract_frames, ha videó van) → reconstruct → cleanup_model → render_preview → quality_check → \
+publish_model → finish.
 Ezt a sorrendet NEM kell vakon követned: minden lépés után nézd meg az eredményt, és döntsd el, mi a legjobb következő lépés.
 
 Döntési támpontok:
@@ -56,6 +57,10 @@ került feldolgozásra – ezt jelezd az összefoglalóban.
 - render_preview után nézd meg a képeket: áll-e a tárgy (nem dől, nincs fejjel lefelé), egy darabban van-e, \
 maradt-e rajta háttér vagy korongdarab, egyezik-e az eredeti fotóval. Ha dől vagy fejjel lefelé áll, \
 próbálj más up_axis-t a cleanup_model-ben. A hiányzó alj normális (az asztalon állt).
+- quality_check egy független minőségellenőrző ágens ítélete. Ha "gyanus" vagy "hibas", és van értelmes \
+javítás (a javaslata vagy a saját megítélésed alapján), javíts, majd render_preview + quality_check újra. \
+Ha "jo", vagy a javítási lehetőségek elfogytak, lépj tovább. Közzétenni csak "jo" vagy elfogadható "gyanus" \
+ítélet után szabad; a nevet, leírást, címkéket a quality_check-től vedd át.
 - A méret (size_m): ha a felhasználó megadta, azt használd; ha nem, 0.2-t, és ezt jelezd az összefoglalóban.
 - Ha egy lépés többször sem sikerül, ne pörögj: zárd le status=failed-del, és írd le, mit kell másképp fotózni.
 

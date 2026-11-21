@@ -118,7 +118,7 @@
   - döntések és tervezés: Opus 5.5
 - Minden döntés és indoklás naplózva, és a demón élőben látható (terminál / weboldal)
 
-### 6.1 Vezérlő ágens – a gerinc (1. prioritás)
+### 6.1 Vezérlő ágens – a gerinc (1. prioritás) ✅ kész: `agent/controller.py`
 - Eszközök: `extract_frames`, `mask`, `reconstruct`, `cleanup`, `preview`, `publish`
 - Minden lépés után: napló + köztes eredmény → döntés a következő lépésről
 - Önjavítás, példák:
@@ -127,7 +127,7 @@
   - a körök nem illeszkednek → külön szkennelések
 - Leállási feltétel: minőségellenőrző „rendben”, vagy max. N próbálkozás
 
-### 6.2 Minőségellenőrző ágens (1. prioritás)
+### 6.2 Minőségellenőrző ágens (1. prioritás) ✅ kész: `agent/qa.py` (`quality_check` eszköz)
 - Előnézetek vs. eredeti fotók (vision)
 - Kimenet: ítélet (rendben / gyanús / hibás) + konkrét hiba + javasolt javítás
 - Visszacsatol a vezérlőnek → önjavító kör
@@ -142,7 +142,7 @@
 - Méretezés a korong 5 cm-es skálájából → nincs kézi `--size`
 - Ellenőrzés renderrel a javítás után
 
-### 6.5 Kurátor ágens (kis bővítés)
+### 6.5 Kurátor ágens (kis bővítés) ✅ kész: a `quality_check` írja a nevet, leírást, címkéket
 - Név, leírás, címkék, kategória → `models.json`
 - Opcionálisan: LOD-ok, ütközési háló, valós méret ellenőrzése
 
@@ -179,12 +179,14 @@
 - [x] Szoftverek telepítése és tesztelése (`setup ok`, 2026-11-21)
 - [x] Teljes lánc a mintakészleten, az ágens eszközein keresztül (~75 s, 2026-11-21)
 - [x] Vezérlő ágens első változata: `agent/controller.py` + `agent/tools.py`
+- [x] Minőségellenőrző + kurátor ágens: `agent/qa.py`; a tartalék `auto.sh` is ezt használja
+- [x] Dokumentáció: `MUKODES.md`, `TESZT.md`, `CLAUDE.md`, `HowToUse.pdf`; prezentáció: `presentation/prezentacio.pdf`
 - [ ] Alkatrészek, korong nyomtatása
 - [ ] Otthoni próbaszkennelés, futásidő mérése
 - [ ] Hosting beállítása
 - [ ] Csapattárs meghívása
 - [ ] 2–3 demómodell
-- [ ] Claude API-kulcs, a kulcs a `.env`-ben (git-ignorálva)
+- [x] Claude API-kulcs, a kulcs a `.env`-ben (git-ignorálva)
 - [ ] 1–2 szándékosan hibás szkennelés az önjavító kör teszteléséhez
 
 ## 10. Mappaszerkezet
