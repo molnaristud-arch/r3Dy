@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="hu">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Szkennelt modellek</title>
+  <link rel="icon" href="data:,">
+  <script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@4.0.0/dist/model-viewer.min.js"></script>
+  <style>
+    :root { --bg: #f6f6f4; --card: #fff; --text: #1b1b1b; --muted: #666; --accent: #2f6fde; }
+    @media (prefers-color-scheme: dark) { :root { --bg: #15171c; --card: #1f2229; --text: #eee; --muted: #9aa; --accent: #7aa7ff; } }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: system-ui, sans-serif; background: var(--bg); color: var(--text); }
+    header { padding: 24px 16px 8px; max-width: 1200px; margin: 0 auto; }
+    h1 { margin: 0 0 4px; font-size: 1.6rem; }
+    header p { margin: 0; color: var(--muted); }
+    #search { margin-top: 16px; width: 100%; max-width: 360px; padding: 10px 12px; border-radius: 8px; border: 1px solid #8884; background: var(--card); color: var(--text); }
+    main { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; padding: 16px; max-width: 1200px; margin: 0 auto; }
+    .card { background: var(--card); border-radius: 12px; overflow: hidden; box-shadow: 0 1px 3px #0002; }
+    model-viewer { width: 100%; height: 260px; background: linear-gradient(#8881, #8882); }
+    .info { padding: 12px 14px; }
+    .info h2 { margin: 0 0 4px; font-size: 1.05rem; }
+    .meta { color: var(--muted); font-size: .85rem; }
+    .desc { margin: 6px 0 0; font-size: .9rem; line-height: 1.4; }
+    .tags { margin: 8px 0; display: flex; flex-wrap: wrap; gap: 6px; }
+    .tag { font-size: .75rem; padding: 2px 8px; border-radius: 99px; border: 1px solid #8886; }
+    a.dl { color: var(--accent); font-weight: 600; text-decoration: none; margin-right: 12px; }
+    #empty { grid-column: 1 / -1; color: var(--muted); }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Szkennelt modellek</h1>
+    <p>Forgóasztalon fotózott tárgyak 3D-ben – forgasd, nézd meg AR-ben, töltsd le.</p>
+    <input id="search" type="search" placeholder="Keresés név, leírás vagy címke alapján…" aria-label="Keresés">
+  </header>
+  <main id="grid"></main>
+
+  <script type="module">
+    const grid = document.getElementById('grid');
+    const search = document.getElementById('search');
+    let models = [];
+
+    const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+    function render() {
+      const q = search.value.trim().toLowerCase();
+      const list = models.filter(m => !q || [m.name, m.description, ...(m.tags || [])].join(' ').toLowerCase().includes(q));
+      grid.innerHTML = list.length ? list.map(m => `
+        <article class="card">
+          <model-viewer src="models/${esc(m.file)}" alt="${esc(m.name)}" camera-controls auto-rotate ar shadow-intensity="1" loading="lazy"></model-viewer>
+          <div class="info">
+            <h2>${esc(m.name)}</h2>
+            <div class="meta">${esc(m.size || '')}${m.faces ? ` · ${Number(m.faces).toLocaleString('hu-HU')} lap` : ''}</div>
+            ${m.description ? `<p class="desc">${esc(m.description)}</p>` : ''}
+            <div class="tags">${(m.tags || []).map(t => `<span class="tag">${esc(t)}</span>`).join('')}</div>
+            <a class="dl" href="models/${esc(m.file)}" download>GLB letöltése</a>
+            ${m.blend ? `<a class="dl" href="models/${esc(m.blend)}" download>.blend</a>` : ''}
+          </div>
+        </article>`).join('') : '<p id="empty">Nincs találat.</p>';
+    }
+
+    search.addEventListener('input', render);
+    fetch('models/models.json').then(r => r.json()).then(d => { models = d; render(); })
+      .catch(() => { grid.innerHTML = '<p id="empty">A modellek listája nem tölthető be.</p>'; });
+  </script>
+</body>
+</html>

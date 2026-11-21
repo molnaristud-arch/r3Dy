@@ -1,1 +1,16 @@
+# private checklist – never commit
 TODO.md
+# secrets (Claude API key)
+.env
+# photos, videos and intermediate results stay local – except the 11-photo test set (AGPL, never publish models from it)
+data/*
+!data/sample/
+data/sample/*
+!data/sample/images/
+!data/sample/LICENSE
+!data/sample/README.md
+.venv/
+__pycache__/
+*.blend1
+.vercel
+*.log

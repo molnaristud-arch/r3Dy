@@ -176,8 +176,9 @@
 | 8:00–9:00 | főpróba ×2, tartalék modellek | |
 
 ## 9. Előzetes teendők
-- [ ] Szoftverek telepítése és tesztelése
-- [ ] Teljes lánc a mintakészleten
+- [x] Szoftverek telepítése és tesztelése (`setup ok`, 2026-11-21)
+- [x] Teljes lánc a mintakészleten, az ágens eszközein keresztül (~75 s, 2026-11-21)
+- [x] Vezérlő ágens első változata: `agent/controller.py` + `agent/tools.py`
 - [ ] Alkatrészek, korong nyomtatása
 - [ ] Otthoni próbaszkennelés, futásidő mérése
 - [ ] Hosting beállítása
