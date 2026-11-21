@@ -2,7 +2,25 @@
   {
     "name": "Példa: avokádó (Khronos mintamodell, CC0)",
     "file": "example.glb",
-    "tags": ["példa", "teszt"],
+    "tags": [
+      "példa",
+      "teszt"
+    ],
     "size": "csak a felület tesztjéhez"
+  },
+  {
+    "name": "Arduino Uno forgótányéron",
+    "file": "arduino-uno-forgotanyeron.glb",
+    "tags": [
+      "arduino",
+      "panel",
+      "elektronika",
+      "mikrokontroller",
+      "korong"
+    ],
+    "faces": 49999,
+    "size": "16.4 × 19.0 × 12.3 cm (sz × m × mag)",
+    "description": "Kék Arduino Uno mikrokontroller-fejlesztőlap fekete USB-csatlakozóval és IC-foglalattal, kerek, szögskálás, foltmintás kartonkorongon.",
+    "blend": "arduino-uno-forgotanyeron.blend"
   }
 ]
