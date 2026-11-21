@@ -14,3 +14,5 @@ __pycache__/
 *.blend1
 .vercel
 *.log
+# LibreOffice lock files
+.~lock.*#
