@@ -129,12 +129,16 @@ cd "$HOME/Documents/cursor/Hackathon 2026"
 [eszköz]    reconstruct({"max_image_size": 2000})
 [eredmény]  reconstruct → {"ok": true, "total_images": 72, "registered_images": 70, "sparse_models": 1, …}
 …
+[eszköz]    cleanup_model({"size_m": 0.24, "remove_disc": true})
+[eredmény]  cleanup_model → {"ok": true, "disc_removed": true, "tilt_corrected_deg": 38.5, "object_size_cm": [6.2, 6.5, 1.0], …}
+…
 [eszköz]    quality_check({})
 [eredmény]  quality_check → {"nev": "…", "minoseg": "jo", …}
 [kész]      KÉSZ (N perc M s, K lépés)
 ```
 - **Futásidő:** becslés szerint **8–20 perc** – ez lesz az első valódi mérés, írjátok fel. Közben a laptop legyen töltőn, a böngésző zárva.
-- **Elvárt előnézet** (`data/modell_1/preview/view_0.png`): a tárgy **egyenesen áll**, felismerhető, a textúrája hasonlít a fotókhoz, oldalt nincs nagy lyuk. **Normális:** hiányzó vagy lapos alj, korongdarab a talpnál, enyhén hepehupás felület.
+- **Elvárt előnézet** (`data/modell_1/preview/view_0.png`): a tárgy **egyenesen áll**, felismerhető, a textúrája hasonlít a fotókhoz, oldalt nincs nagy lyuk. **A korong nincs rajta** (`remove_disc`), az `object_size_cm` nagyjából egyezik a tárgy vonalzóval mért méretével (±10%). **Normális:** hiányzó vagy lapos alj, enyhén hepehupás felület, apró korongfolt a talp szélén.
+- **Csak a korong levágása, ágens nélkül** (pár mp): `./blender/run.sh cleanup data/modell_1/model/model.obj /tmp/k.glb --remove-disc` → `DISC: {"tilt_corrected_deg": …, "plane_noise_mm": 0.35, "cut_mm": 1.0, …, "object_size_cm": […]}`. Ha a tárgy alja is eltűnt: `--cut-mm 0.5`; ha korongmaradék látszik: `--cut-mm 2`.
 
 ### 4.5 Közzététel
 

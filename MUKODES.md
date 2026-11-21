@@ -255,6 +255,22 @@ Ha a 3. lépés nem tud modellt építeni (kevés átfedés vagy mintázat), a s
 
 Pontosan a 2.11-es lépések: OBJ-import (`up = -Y`), legnagyobb darab, decimálás 50 000 háromszögre, méretezés, talppont az origóban, simítás, **GLB + .blend**. A `run.sh` a Blendert fej nélkül indítja, a `.venv` numpy-jával, és a Python-hibát **nem nulla kilépési kóddal** jelzi – enélkül a Blender hiba esetén is „sikert” jelentene, és a lánc hibás modellel menne tovább.
 
+**Korong levágása (`--remove-disc`, forgóasztalos szkennelésnél ajánlott):**
+
+```bash
+./blender/run.sh cleanup modell_N/model/model.obj modell_N/model.glb --remove-disc --disc-diameter 0.19
+```
+
+1. **Síkkeresés (RANSAC):** a háló legfeljebb 150 000 pontjából 500-szor három véletlen pontra síkot illeszt; az a sík nyer, amelyhez a legtöbb pont van 0,4%-on (a befoglaló átló arányában) belül – ez a korong. 8% alatti támogatottságnál hiba (nincs korong a modellen).
+2. **Finomítás:** a síkhoz tartozó pontokra legkisebb négyzetes sík (a 3×3-as kovariancia legkisebb sajátvektora); a normál a tárgy felé mutat.
+3. **Vízszintezés:** forgatás, amely a normált a +Z-be viszi (Rodrigues) – így a COLMAP-igazítás dőlését is javítja (mért: 38,5° és 92,1°).
+4. **Méretezés a korongból:** a korongpontok sugara (98. percentilis) a nyomtatott korong ismert átmérőjének fele → **valódi méret mérés nélkül** (a `--size` ilyenkor nem számít).
+5. **Levágás:** törlődik minden csúcs a sík fölötti `--cut-mm` (alap 1 mm, de legalább a síkzaj 3σ-ja) alatt és a korong sugarán kívül; utána a legnagyobb darab marad.
+
+A kimenet `DISC: {…}` sora: `tilt_corrected_deg`, `disc_support`, `plane_noise_mm`, `cut_mm`, `object_size_cm`. Mért (Arduino Uno, 19 cm-es korong): 6,2 × 6,5 × 1,0 cm (38 kép) és 6,3 × 7,8 × 1,2 cm (76 kép), 3–5 s, 0,6–1,2 GB memória. A 2 mm-es vágás már lyukakat ütött a lapos panelbe, ezért lett 1 mm az alap.
+
+**Memória:** a `run.sh` a Blendert `systemd-run --user --scope -p MemoryMax=6G` alatt indítja (`BLENDER_MEM` env), így túlfutáskor csak a Blender áll le, nem a terminál. A darabokra bontás scipy-összefüggőkomponensekkel és egyetlen kijelölés + törlés megy (a Blender `separate(LOOSE)` a korong levágása után több ezer objektumot hozna létre).
+
 ### 3.7 Előnézet: `blender/run.sh preview` (`blender/preview.py`)
 
 Négy nézet (elölről, kissé felülről, majd 90°-onként körbe) 800×800-as, átlátszó hátterű PNG-be (`modell_N/preview/view_0..3.png`), a Blender gyors *Workbench* renderelőjével, textúraszínekkel és stúdiófénnyel. Ez a **minőségellenőrzés**: a `view_0.png`-n a tárgynak állnia kell, felismerhetőnek lennie.
@@ -358,7 +374,7 @@ web/models/
 | egyszínű, mintázatlan felület lyukas / hepehupás | nincs mit párosítani (2.2, 2.8) |
 | a tárgy alja hiányzik | alulról egy kamera sem látta (2.9) – megoldás: megfordítva is lefotózni, két modell összeillesztése (nincs automatizálva) |
 | mintázott háttér elrontja | a forgóasztal-trükk feltétele sérül (2.5) – egyszínű háttér vagy `--mask` |
-| a méretet kézzel kell megadni | az SfM mértéke ismeretlen (2.4) – a korong 5 cm-es skálája ellenőrzésre jó; automatikus méretezés egy ismert méretű jelölővel lehetséges továbblépés |
+| a méret a korongon múlik | az SfM mértéke ismeretlen (2.4); `--remove-disc` a korong ismert átmérőjéből méretez (3.6) – ha a korong nem látszik eléggé, kézi `--size` kell |
 | vékony részek (drót, haj) eltűnnek | a 2000 px-es képméret és a háló felbontása nem bírja; a decimálás (2.11) tovább egyszerűsít |
 | motor csak könnyű tárgyhoz | a 28BYJ-48 tengelye nem csapágy – nehezebb tárgynál a tányér súlyát csapágy (pl. áram nélküli ventilátor) vigye |
 
@@ -366,6 +382,4 @@ web/models/
 
 - **Fotózási segítő ágens** (TERV 6.3): a beérkező képek ellenőrzése fotózás közben, és konkrét utasítás, melyik szögből kell még kép.
 - **Blender ágens** (TERV 6.4): `bpy`-kódot ír a javításokhoz (lyukak, talp, tájolás), és renderrel ellenőrzi.
-- **Automatikus méretezés**: a korongon lévő ismert méretű jelölők (pl. ArUco) felismerése a képeken → valódi mérték kézi mérés nélkül.
 - **Alj pótlása**: második felvétel a tárgy megfordításával, a két háló automatikus összeillesztése.
-- **A tárgy és a korong szétválasztása** a hálón (a talp alatti lapos korongdarab automatikus levágása síkillesztéssel).

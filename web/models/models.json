@@ -9,18 +9,33 @@
     "size": "csak a felület tesztjéhez"
   },
   {
-    "name": "Arduino Uno forgótányéron",
-    "file": "arduino-uno-forgotanyeron.glb",
+    "name": "Arduino Uno – 1. szkennelés (38 fotó)",
+    "file": "arduino-uno-1-szkenneles-38-foto.glb",
     "tags": [
       "arduino",
       "panel",
       "elektronika",
       "mikrokontroller",
-      "korong"
+      "áramkör"
     ],
-    "faces": 49999,
-    "size": "16.4 × 19.0 × 12.3 cm (sz × m × mag)",
-    "description": "Kék Arduino Uno mikrokontroller-fejlesztőlap fekete USB-csatlakozóval és IC-foglalattal, kerek, szögskálás, foltmintás kartonkorongon.",
-    "blend": "arduino-uno-forgotanyeron.blend"
+    "faces": 36450,
+    "size": "6.2 × 6.5 × 1.0 cm (sz × m × mag)",
+    "description": "Kék nyomtatott áramkörű Arduino Uno fejlesztőlap fekete IC-foglalattal és tüskesorokkal, ezüst kvarckristállyal, fémes USB-B csatlakozóval és UNO felirattal. A korongot az ágens levágta, a méret a korong átmérőjéből jön.",
+    "blend": "arduino-uno-1-szkenneles-38-foto.blend"
+  },
+  {
+    "name": "Arduino Uno – 2. szkennelés (76 fotó)",
+    "file": "arduino-uno-2-szkenneles-76-foto.glb",
+    "tags": [
+      "arduino",
+      "panel",
+      "elektronika",
+      "mikrovezérlő",
+      "áramkör"
+    ],
+    "faces": 50000,
+    "size": "6.3 × 7.8 × 1.2 cm (sz × m × mag)",
+    "description": "Kék Arduino Uno fejlesztőpanel fekete DIP tokozású mikrovezérlővel, ezüstös USB-B csatlakozóval, hengeres tápcsatlakozóval, kondenzátorokkal és kvarckristállyal. Két magasságból, 76 fotóból; a korong levágva, a méret a korong átmérőjéből.",
+    "blend": "arduino-uno-2-szkenneles-76-foto.blend"
   }
 ]

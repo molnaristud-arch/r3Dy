@@ -1,0 +1,22 @@
+{
+  "nev": "Arduino Uno panel",
+  "leiras": "Kék nyomtatott áramköri lapú Arduino Uno fejlesztőpanel, fekete DIP tokozású mikrovezérlővel, ezüstös USB-B csatlakozóval és fekete hengeres tápcsatlakozóval. A lapon fehér \"UNO\" felirat, két elektrolitkondenzátor, kvarckristály és fekete tüskesorok láthatók.",
+  "cimkek": [
+    "arduino",
+    "panel",
+    "elektronika",
+    "mikrovezérlő",
+    "áramkör"
+  ],
+  "minoseg": "gyanus",
+  "hibak": [
+    "A tüskesorok és a csatlakozók torzak, olvadtnak tűnnek, a vékony részek hullámosak.",
+    "Az USB-csatlakozó és a tápcsatlakozó alakja elmosódott, durva.",
+    "A textúra sötét és foltos, az apró feliratok alig olvashatók.",
+    "A panel széle rongyos, lyukak és hiányzó darabok vannak rajta, valamint narancssárga folt tapadt az egyik oldalára (a korongon lévő jelölés maradványa).",
+    "Az alsó oldalon vékony korongdarab és hiányzó alj látszik, ami normális."
+  ],
+  "javaslat": "Matt, egyenletesen megvilágított környezetben, több magasságból (plusz kör felülről és oldalról) kellene fotózni, és a korongon lévő jelölőt el kell távolítani vagy kivágni a feldolgozás előtt.",
+  "model": "claude-sonnet-5-5",
+  "size_cm": "6.3 × 7.8 × 1.2 cm"
+}

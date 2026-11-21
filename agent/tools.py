@@ -27,6 +27,7 @@ ROOT = Path(__file__).resolve().parent.parent
 PY = str(ROOT / ".venv" / "bin" / "python")
 MICROMAMBA = os.environ.get("MICROMAMBA", str(Path.home() / ".local" / "bin" / "micromamba"))
 os.environ.setdefault("MAMBA_ROOT_PREFIX", str(Path.home() / ".local" / "share" / "micromamba"))
+DISC_DIAMETER_M = float(os.environ.get("DISC_DIAMETER_M", "0.19"))  # printed turntable disc (capture/disc_a4.svg)
 SITE = os.environ.get("SITE", "https://r3dy-web.vercel.app")  # live site; SITE= (empty) skips the wait
 IMAGE_EXT = {".jpg", ".jpeg", ".png"}
 VIDEO_EXT = {".mp4", ".mov", ".mkv", ".webm", ".3gp"}
@@ -80,13 +81,20 @@ TOOL_SCHEMAS = [
     {
         "name": "cleanup_model",
         "description": "Blender: a legnagyobb összefüggő rész megtartása, egyszerűsítés, méretezés (leghosszabb oldal = size_m), "
-                       "talp z=0-ra, GLB + .blend export → model.glb. Gyors (~5–20 s). Újrafuttatható más paraméterekkel.",
+                       "talp z=0-ra, GLB + .blend export → model.glb. Gyors (~5–30 s). Újrafuttatható más paraméterekkel. "
+                       "remove_disc=true (csak ha a fotókon látszik a nyomtatott korong – ott AJÁNLOTT; korong nélkül a talajt hinné korongnak): megkeresi a nyomtatott korong síkját, ahhoz "
+                       "vízszintezi a modellt (a dőlést is javítja), a korong ismert átmérőjéből valódi méretre skáláz "
+                       "(ilyenkor a size_m nem számít), és levágja a korongot meg mindent alatta / körülötte. "
+                       "Ha a tárgy alja is eltűnik, kisebb cut_mm kell; ha korongmaradék látszik, nagyobb.",
         "input_schema": _schema({
             "size_m": {"type": "number", "minimum": 0.01, "maximum": 3, "description": "a tárgy leghosszabb mérete méterben"},
             "faces": {"type": "integer", "minimum": 5000, "maximum": 300000, "description": "célzott lapszám (alap 50000)"},
             # Z / NEGATIVE_Z are not offered: the importer's forward axis is Z, and forward == up is invalid
             "up_axis": {"type": "string", "enum": ["NEGATIVE_Y", "Y", "X", "NEGATIVE_X"],
                         "description": "melyik tengely a 'fel' az OBJ-ban; alap NEGATIVE_Y (a COLMAP-igazítás után ez a helyes)"},
+            "remove_disc": {"type": "boolean", "description": "korong keresése, vízszintezés, méretezés a korongból, korong levágása"},
+            "cut_mm": {"type": "number", "minimum": 0, "maximum": 30,
+                       "description": "remove_disc esetén ennyit vág le a korong síkja fölött is (alap 1 mm; a síkzaj 3σ-ja alá nem megy)"},
         }, ["size_m"]),
     },
     {
@@ -281,17 +289,32 @@ def reconstruct(scan: Scan, max_image_size: int) -> dict:
     return res
 
 
-def cleanup_model(scan: Scan, size_m: float, faces: int = 50000, up_axis: str = "NEGATIVE_Y") -> dict:
+def cleanup_model(scan: Scan, size_m: float, faces: int = 50000, up_axis: str = "NEGATIVE_Y",
+                  remove_disc: bool = False, cut_mm: float = 1.0) -> dict:
     obj = scan.dir / "model" / "model.obj"
     if not obj.is_file():
         raise ToolError("Nincs model/model.obj – előbb reconstruct kell.")
-    rc, out, t = scan.run(["./blender/run.sh", "cleanup", str(obj), str(scan.dir / "model.glb"),
-                           "--faces", str(faces), "--size", str(size_m), "--up", up_axis, "--blend"], timeout=900)
+    cmd = ["./blender/run.sh", "cleanup", str(obj), str(scan.dir / "model.glb"),
+           "--faces", str(faces), "--size", str(size_m), "--up", up_axis, "--blend"]
+    if remove_disc:
+        cmd += ["--remove-disc", "--disc-diameter", str(DISC_DIAMETER_M), "--cut-mm", str(cut_mm)]
+    rc, out, t = scan.run(cmd, timeout=900)
+    disc = None
+    m = re.search(r"^DISC: (\{.*\})$", out, re.M)
+    if m:
+        disc = json.loads(m.group(1))
     if rc:
+        if disc and "error" in disc:
+            raise ToolError(f"A korong nem található: {disc['error']} – próbáld remove_disc nélkül.")
         raise ToolError(f"Blender cleanup hiba ({classify_error(out)}):\n{tail(out)}")
     glb = scan.dir / "model.glb"
-    return {"ok": True, "glb_mb": round(glb.stat().st_size / 1e6, 1), "size_m": size_m, "faces": faces,
-            "up_axis": up_axis, "seconds": t, "blender_log": tail(out, 8)}
+    res = {"ok": True, "glb_mb": round(glb.stat().st_size / 1e6, 1), "faces": faces, "seconds": t}
+    if disc:
+        res.update({"disc_removed": True, **disc})
+    else:
+        res.update({"size_m": size_m, "up_axis": up_axis})
+    res["blender_log"] = tail(out, 6)
+    return res
 
 
 def render_preview(scan: Scan) -> tuple[dict, list[dict]]:
@@ -400,6 +423,8 @@ def execute(scan: Scan, name: str, args: dict) -> tuple[dict, list[dict]]:
 if __name__ == "__main__":
     if len(sys.argv) < 3:
         sys.exit(__doc__)
+    from controller import load_env  # quality_check needs ANTHROPIC_API_KEY from .env
+    load_env()
     s = Scan(sys.argv[1], allow_publish=False)
     result, extra = execute(s, sys.argv[2], json.loads(sys.argv[3]) if len(sys.argv) > 3 else {})
     print(json.dumps(result, ensure_ascii=False, indent=2))

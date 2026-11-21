@@ -15,4 +15,10 @@ shift
 [[ -f "$script" ]] || { echo "No such script: $script" >&2; exit 1; }
 site="$(echo "$root"/.venv/lib/python3.*/site-packages)"
 [[ -d "$site" ]] || { echo "Missing $root/.venv — run ./setup.sh first" >&2; exit 1; }
-PYTHONPATH="$site${PYTHONPATH:+:$PYTHONPATH}" exec blender -b --factory-startup --python-use-system-env --python-exit-code 1 -P "$script" -- "$@"
+# Memory cap (BLENDER_MEM, default 6G): if Blender overruns it, only Blender is killed – not the
+# terminal / editor it was started from (a global OOM once took the whole session down).
+cap=()
+if command -v systemd-run >/dev/null && systemd-run --user --scope -q -p MemoryMax=1G true 2>/dev/null; then
+  cap=(systemd-run --user --scope -q -p "MemoryMax=${BLENDER_MEM:-6G}" -p MemorySwapMax=0)
+fi
+PYTHONPATH="$site${PYTHONPATH:+:$PYTHONPATH}" exec "${cap[@]}" blender -b --factory-startup --python-use-system-env --python-exit-code 1 -P "$script" -- "$@"

@@ -7,7 +7,7 @@
 - **Teszt és elvárt kimenetek:** `TESZT.md` – ha a lánc vagy az ágens kimenete, kapcsolói változnak, ezt is.
 - `TODO.md` – helyi, git-ignorált ellenőrzőlista (régi azonosítókat sorol fel): **soha ne commitold**, és a tartalmát ne másold a repó más fájljaiba.
 
-Repó: `github.com/molnaristud-arch/r3Dy` (privát), ág `main`. Ebben a mappában a git SSH-n a `github-molnaristud` host aliasszal pushol, a commit-identitás repó-szintű (`molnaristud-arch`). A gép globális git- és `gh`-beállításai egy másik fiókhoz tartoznak – azokat ne módosítsd.
+Repó: `github.com/molnaristud-arch/r3Dy` (nyilvános), ág `main`. Ebben a mappában a git SSH-n a `github-molnaristud` host aliasszal pushol, a commit-identitás repó-szintű (`molnaristud-arch`). A gép globális git- és `gh`-beállításai egy másik fiókhoz tartoznak – azokat ne módosítsd.
 
 ## Ágensek (`agent/`)
 
@@ -25,7 +25,7 @@ Repó: `github.com/molnaristud-arch/r3Dy` (privát), ág `main`. Ebben a mappáb
 - `pipeline/extract_frames.py` – videóból egyenletes időközönként a legélesebb kocka (Laplace-szórás), ablakonként azonnal kiírva.
 - `pipeline/mask.py` – háttér kivágása (`rembg`, GPU) → `<scan>/masked`; ha létezik, a `reconstruct.sh` ezt használja.
 - `pipeline/reconstruct.sh` – COLMAP (jellemzőpontok, exhaustive matching, mapper, `model_orientation_aligner --method IMAGE-ORIENTATION`, undistort) → OpenMVS (Densify, ReconstructMesh, TextureMesh) → `<scan>/model/model.obj`.
-- `blender/run.sh cleanup|preview …` – a Blender-szkriptek indítója (`--python-exit-code 1`, különben a Blender mindig 0-val lép ki). `cleanup.py`: import (`--up NEGATIVE_Y`), legnagyobb darab, decimálás, lépték (`--size` m), talp az origóban, GLB (+ `--blend`). `preview.py`: N nézet PNG-be.
+- `blender/run.sh cleanup|preview …` – a Blender-szkriptek indítója (`--python-exit-code 1`, különben a Blender mindig 0-val lép ki). `cleanup.py`: import (`--up NEGATIVE_Y`), `--remove-disc` (RANSAC-sík → vízszintezés, méretezés a korong átmérőjéből `--disc-diameter 0.19`, levágás `--cut-mm 1`; kimenet: `DISC: {json}`), legnagyobb darab (scipy-komponensek), decimálás, lépték (`--size` m), talp az origóban, GLB (+ `--blend`). `preview.py`: N nézet PNG-be.
 - `pipeline/publish.py` – GLB (+ .blend) → `web/models/<slug>.glb`, bejegyzés a `models.json`-ba.
 - `pipeline/auto.sh` – **tartalék**, fix sorrendű lánc ágens nélkül (`--watch`, `--size`, `--mask`, `--frames`, `--no-ai`, …); a végén `agent/qa.py`-tól kér javaslatot. Az élő oldal címe a `SITE` környezeti változó (alap: https://r3dy-web.vercel.app; üres = nem várja meg az élesítést).
 - `web/` – statikus oldal, `<model-viewer>@4.0.0`. Éles: **https://r3dy-web.vercel.app** (Vercel-projekt `r3dy-web`, csapat `is2`, Root Directory `web`, preset Other); minden push a `main`-re élesít, csak a `web/` megy ki (ellenőrizve: `/TERV.md`, `/.env` → 404).
@@ -45,6 +45,8 @@ Repó: `github.com/molnaristud-arch/r3Dy` (privát), ág `main`. Ebben a mappáb
 - A seam leveling fekete foltokat fest az atlaszra → `--global-seam-leveling 0 --local-seam-leveling 0`.
 - Igazítás után a gravitáció `+Y` → import `up_axis=NEGATIVE_Y`. Az importer előre-tengelye `Z`, ezért `up_axis` nem lehet `Z`/`NEGATIVE_Z`.
 - 6 GB VRAM: a max képméret 2000.
+- **RAM (OOM, 2026-11-21):** `np.linalg.svd(N×3)` teljes U-t (N×N) számol → 80+ GB; síkhoz 3×3 kovariancia + `eigh`. A `separate(LOOSE)` sok darabnál szintén elszáll – scipy `connected_components` + egy `mesh.delete`. A Blendert a `run.sh` `MemoryMax=6G` alatt futtatja; OpenMVS-sel párhuzamosan ne futtass Blendert.
+- Korong levágása: 2 mm már lyukat üt egy lapos panelbe, 1 mm jó (síkzaj 0,35–0,5 mm).
 - A regisztrált képek száma: `colmap model_analyzer --path work/sparse/0` → „Registered images: N”.
 - A mintán (11 kép) a vezérlő ágens magától háttérkivágást kért a talaj- és égfoltok miatt, és az eredmény jobb lett (2026-11-21, ~5 perc, 8 lépés).
 

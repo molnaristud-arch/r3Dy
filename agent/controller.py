@@ -55,13 +55,18 @@ került feldolgozásra – ezt jelezd az összefoglalóban.
 - cuda_oom: reconstruct kisebb max_image_size-zal (1600, majd 1200).
 - 20 kép alatt nagy eséllyel nem áll össze: ezt mondd ki, és ha mégis próbálod, jelezd a kockázatot.
 - render_preview után nézd meg a képeket: áll-e a tárgy (nem dől, nincs fejjel lefelé), egy darabban van-e, \
-maradt-e rajta háttér vagy korongdarab, egyezik-e az eredeti fotóval. Ha dől vagy fejjel lefelé áll, \
-próbálj más up_axis-t a cleanup_model-ben. A hiányzó alj normális (az asztalon állt).
+maradt-e rajta háttér vagy korongdarab (ha igen: cleanup_model remove_disc=true, vagy nagyobb cut_mm), egyezik-e az eredeti fotóval. Ha dől vagy fejjel lefelé áll, \
+próbálj más up_axis-t a cleanup_model-ben. A hiányzó vagy lapos alj normális (a korongon állt).
 - quality_check egy független minőségellenőrző ágens ítélete. Ha "gyanus" vagy "hibas", és van értelmes \
 javítás (a javaslata vagy a saját megítélésed alapján), javíts, majd render_preview + quality_check újra. \
 Ha "jo", vagy a javítási lehetőségek elfogytak, lépj tovább. Közzétenni csak "jo" vagy elfogadható "gyanus" \
 ítélet után szabad; a nevet, leírást, címkéket a quality_check-től vedd át.
-- A méret (size_m): ha a felhasználó megadta, azt használd; ha nem, 0.2-t, és ezt jelezd az összefoglalóban.
+- cleanup_model: ha a fotókon látszik a nyomtatott forgóasztal-korong, először remove_disc=true-val próbáld (a korong síkjához \
+vízszintez, a korong ismert átmérőjéből valódi méretre skáláz, és levágja a korongot). Az eredményben az \
+object_size_cm a tárgy valódi mérete – vesd össze azzal, amit a fotókon látsz. Ha a korong nem található \
+(hiba), vagy a tárgy alja is eltűnt, próbáld újra kisebb cut_mm-mel, végső esetben remove_disc nélkül.
+- A méret (size_m): csak remove_disc nélkül számít. Ha a felhasználó megadta, azt használd; ha nem, 0.2-t, \
+és ezt jelezd az összefoglalóban.
 - Ha egy lépés többször sem sikerül, ne pörögj: zárd le status=failed-del, és írd le, mit kell másképp fotózni.
 
 Stílus (a naplódat élőben vetítjük egy közönségnek): gondolkodj és írj végig magyarul. Minden eszközhívás előtt írj EGY rövid magyar mondatot \

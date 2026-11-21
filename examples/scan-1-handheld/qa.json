@@ -1,22 +1,22 @@
 {
-  "nev": "Arduino Uno forgótányéron",
-  "leiras": "Kék Arduino Uno mikrokontroller-fejlesztőlap fekete USB-csatlakozóval és fekete IC-foglalattal, kerek, szögskálás kartonkorongra ragasztva. A korong fehér, sűrű fekete foltmintázattal van nyomtatva, a szélén fekete ragasztószalag-darabok és egy narancssárga jelölés látszik.",
+  "nev": "Arduino Uno panel",
+  "leiras": "Kék nyomtatott áramkörű Arduino Uno fejlesztőlap fekete IC-foglalattal és két sor fekete tüskesorral a szélén. Jellegzetes része az ezüst kvarckristály, a fémes USB-B csatlakozó és az UNO felirat.",
   "cimkek": [
     "arduino",
     "panel",
     "elektronika",
     "mikrokontroller",
-    "korong"
+    "áramkör"
   ],
   "minoseg": "gyanus",
   "hibak": [
-    "A modell erősen lapított, a korong és a lap ferdén, vékony lemezként jelenik meg.",
-    "A korong széle hullámos, szakadozott, fehéres foltok tapadnak rá.",
-    "Az Arduino lap kis részletei (alkatrészek, csatlakozók) elmosódottak és torzak.",
-    "A textúra a korongon foltos, a szögskála és a számok nem olvashatók.",
-    "Az alja fekete, zajos, egyenetlen."
+    "A tüskesorok és az aljzatok megolvadt, torz, összefolyt tömbökként jelennek meg.",
+    "Az USB-csatlakozó és a tápcsatlakozó alakja eltorzult, a textúrája foltos.",
+    "A panel szélei szaggatottak, rojtosak, részben hiányosak.",
+    "A textúra sötét és elmosódott, az alkatrészek nehezen különböztethetők meg.",
+    "A modell vékony és részben lapos, a kisebb alkatrészek elvesztek."
   ],
-  "javaslat": "Egyenletesebb megvilágítással, a háttér kivágásával és további fotókkal különböző magasságból (plusz kör felülről) lehetne pontosabb, nem lapított geometriát kapni.",
+  "javaslat": "Jobb, egyenletes megvilágítás, több közeli fotó a panel felső részéről különböző szögekből, valamint a korongminta kihagyása a maszkolásnál javítaná a részletességet.",
   "model": "claude-sonnet-5-5",
-  "size_cm": "16.4 × 19.0 × 12.3 cm"
+  "size_cm": "6.2 × 6.5 × 1.0 cm"
 }
