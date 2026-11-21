@@ -61,7 +61,7 @@
   </div>
   <div class="meta">
     <p><b>Kozma Dávid · Molnár István</b></p>
-    <p>Repó: github.com/molnaristud-arch/r3Dy (privát)</p>
+    <p>Élő oldal: <b>r3dy-web.vercel.app</b> · Repó: github.com/molnaristud-arch/r3Dy (privát)</p>
     <p>Kapcsolódó leírások a repóban: <b>MUKODES.md</b> (elmélet, működés) · <b>TESZT.md</b> (teljes teszt) · <b>TERV.md</b> (terv) · <b>presentation/</b> (demó)</p>
   </div>
 </div>
@@ -242,12 +242,12 @@ gomb            → D2 és GND</pre>
  "leiras": "Fehér, bőr hatású sportcipő szürke talppal és fűzővel.",
  "cimkek": ["cipő", "ruházat"], "minoseg": "jo", "hibak": [], "javaslat": ""}</pre>
 <p><b>Minőség:</b> <b>jo</b> – mehet; <b>gyanus</b> – felismerhető, de hibás részekkel (lyuk, foltos textúra, tapadt háttér, dől) – a vezérlő megpróbálja javítani; <b>hibas</b> – érdemes újrafotózni. A hiányzó alj és a talp alatti korongdarab normális.</p>
-<p>Ha a futás <code>--publish</code>-sel indult, a vezérlő a jó modellt feltölti: a weboldal mappájába másolja, commitol és pushol (a Vercel ~20 s alatt élesít). Ha nem, később ugyanarra a mappára:</p>
+<p>Ha a futás <code>--publish</code>-sel indult, a vezérlő a jó modellt feltölti: a weboldal mappájába másolja, commitol, pushol, és megvárja, amíg a modell megjelenik a <b>r3dy-web.vercel.app</b> oldalon (~20 s). Ha nem, később ugyanarra a mappára:</p>
 <pre>.venv/bin/python agent/controller.py data/modell_1 --size 0.24 --publish</pre>
 <div class="note"><b>Tartalék lánc:</b> az <code>auto.sh</code> a végén ugyanettől az ágenstől kér javaslatot, és megkérdezi: <code>Feltöltsem így? [I/n, s = szerkesztés]</code> – Enter: feltöltés; n: nem; s: méret, név, címkék, leírás szerkesztése. Ha az AI nem érhető el, kézzel kérdez.</div>
 
 <h2 style="margin-top:12pt"><span class="n">9</span>A weboldal használata</h2>
-<p>A Vercel-címen nyilvános, bárki megnyithatja; helyben: <code>cd web &amp;&amp; python3 -m http.server 8000</code>.</p>
+<p><b>https://r3dy-web.vercel.app</b> – nyilvános, bárki megnyithatja; helyben: <code>cd web &amp;&amp; python3 -m http.server 8000</code>.</p>
 <ul>
   <li><b>Kártyák:</b> minden modell forgatható (egér / ujj), nagyítható, magától lassan forog; alatta név, valódi méret, háromszögszám, leírás, címkék.</li>
   <li><b>Keresés:</b> név, leírás vagy címke szerint.</li>

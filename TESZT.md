@@ -15,7 +15,7 @@
                           → publish_model (csak --publish esetén) → git push
                                                                              │
                                                                              ▼
-                                                  Vercel élesít (~20 s) → a weboldal (ha be van állítva)
+                                                  Vercel élesít (~20 s) → https://r3dy-web.vercel.app
 ```
 
 Tartalék, ha az ágens nem használható (pl. nincs internet): `./pipeline/auto.sh --watch --size 0.24` – ugyanaz a lánc, fix sorrendben.
@@ -143,12 +143,12 @@ Ha az eredmény jó, ugyanazon a mappán, közzététellel (a kész lépéseket 
 ```bash
 .venv/bin/python agent/controller.py data/modell_1 --size 0.24 --publish
 ```
-**Elvárt:** `publish_model → {"published": true, "pushed": true}`, a GitHubon új `Add: <név>` commit.
+**Elvárt:** `publish_model → {"published": true, "pushed": true, "live": true, "url": "…/models/<név>.glb"}`, a GitHubon új `Add: <név>` commit.
 
 ### 4.6 Ellenőrzés a weboldalon
 
 - **Helyben:** `cd web && python3 -m http.server 8000` → http://localhost:8000
-- **Élesben:** a Vercel-címen (ha be van állítva, lásd README), Ctrl+Shift+R-rel frissítve.
+- **Élesben:** https://r3dy-web.vercel.app (Ctrl+Shift+R-rel frissítve).
 
 **Elvárt eredmény:**
 - **Kártya** a quality_check által adott névvel, forgatható 3D modellel; a kiírt méret leghosszabb oldala egyezik a lemérttel.

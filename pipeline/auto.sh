@@ -25,7 +25,7 @@ cd "$(dirname "$0")/.."
 
 inbox=data/bejovo
 size=0.2 frames=150 mask=0 watch=0 max=2000 settle=15 open=1 offer=1 use_ai=1
-site=${SITE:-}   # live site URL (e.g. https://example.vercel.app); empty = do not wait for deploy
+site=${SITE-https://r3dy-web.vercel.app}   # live site; SITE= (empty) skips waiting for the deploy
 while (($#)); do
   case $1 in
     --watch) watch=1 ;;

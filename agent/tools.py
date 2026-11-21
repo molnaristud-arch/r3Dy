@@ -27,6 +27,7 @@ ROOT = Path(__file__).resolve().parent.parent
 PY = str(ROOT / ".venv" / "bin" / "python")
 MICROMAMBA = os.environ.get("MICROMAMBA", str(Path.home() / ".local" / "bin" / "micromamba"))
 os.environ.setdefault("MAMBA_ROOT_PREFIX", str(Path.home() / ".local" / "share" / "micromamba"))
+SITE = os.environ.get("SITE", "https://r3dy-web.vercel.app")  # live site; SITE= (empty) skips the wait
 IMAGE_EXT = {".jpg", ".jpeg", ".png"}
 VIDEO_EXT = {".mp4", ".mov", ".mkv", ".webm", ".3gp"}
 
@@ -343,8 +344,35 @@ def publish_model(scan: Scan, name: str, tags: list[str], description: str) -> d
     if rc1 or rc2:
         raise ToolError(f"git commit hiba:\n{tail(out1 + out2)}")
     rc3, out3, _ = scan.run(["git", "push", "-q"], timeout=180)
-    return {"ok": rc3 == 0, "published": True, "committed": True, "pushed": rc3 == 0,
-            **({"push_error": tail(out3)} if rc3 else {})}
+    if rc3:
+        return {"ok": False, "published": True, "committed": True, "pushed": False, "push_error": tail(out3)}
+    return {"ok": True, "published": True, "committed": True, "pushed": True, **wait_live(glb_name(out))}
+
+
+def glb_name(publish_out: str) -> str | None:
+    """publish.py prints '→ web/models/<slug>.glb  (…)'."""
+    m = re.search(r"web/models/([^\s/]+\.glb)", publish_out)
+    return m.group(1) if m else None
+
+
+def wait_live(name: str | None, timeout: int = 180) -> dict:
+    """Poll the live site until the new model is listed and downloadable (Vercel deploys on push)."""
+    import urllib.request
+
+    if not SITE or not name:
+        return {"live": None}
+    t0 = time.time()
+    while time.time() - t0 < timeout:
+        try:
+            with urllib.request.urlopen(f"{SITE}/models/models.json?t={int(time.time())}", timeout=15) as r:
+                if f'"{name}"' in r.read().decode():
+                    req = urllib.request.Request(f"{SITE}/models/{name}", method="HEAD")
+                    with urllib.request.urlopen(req, timeout=15):
+                        return {"live": True, "url": f"{SITE}/models/{name}", "deploy_seconds": round(time.time() - t0)}
+        except OSError:
+            pass
+        time.sleep(5)
+    return {"live": False, "note": f"{timeout} s után még nem látszik az oldalon: {SITE}"}
 
 
 IMPLS = {

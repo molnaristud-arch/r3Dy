@@ -1,6 +1,6 @@
 # Projektterv – 3D szkennelés kézi forgóasztallal (vázlat)
 
-**Csapat:** _TBD_ · **Idő:** 9 óra · **Gép:** _TBD (NVIDIA GPU + CUDA)_ · **Repó:** `github.com/molnaristud-arch/r3Dy` (privát) · **Élő oldal:** _TBD_
+**Csapat:** _TBD_ · **Idő:** 9 óra · **Gép:** MSI GP65 (i7-10750H, 16 GB RAM, RTX 2060 6 GB, Ubuntu 26.04) · **Repó:** `github.com/molnaristud-arch/r3Dy` (privát) · **Élő oldal:** https://r3dy-web.vercel.app
 
 > Vázlat: csak támpontok. A részleteket menet közben töltjük ki.
 
@@ -98,14 +98,14 @@
   6. `publish.py`: `web/models` + `models.json`
   7. `auto.sh --watch`: az egészet vezérli
 - `--size`: a tárgy valódi mérete kézzel, méterben
-- Ismert csapdák: _TBD_
-- Mért futásidők: _TBD_
-- Hibakeresési táblázat: _TBD_
+- Ismert csapdák: `CLAUDE.md` „Tanulságok”, `MUKODES.md` 4.2
+- Mért futásidők: minta (11 kép) lánc ~75 s; ugyanez a vezérlő ágenssel, egy maszkolásos javítással ~5 perc (8 lépés). Valódi, 72 fotós szkennelés: _még mérendő_ (becslés 8–20 perc)
+- Hibakeresési táblázat: `TESZT.md` „Ha valami nem sikerül”
 
 ## 5. Weboldal
 - `<model-viewer>`: kártyarács, forgatás, AR, letöltés (GLB, .blend), keresés, sötét téma
 - Adatforrás: `web/models/models.json`
-- Hosting: _TBD (új Vercel-projekt, Root Directory `web`)_
+- Hosting: Vercel, projekt `r3dy-web` (csapat `is2`), Root Directory `web`, minden push a `main`-re élesít → https://r3dy-web.vercel.app
 - Bővítés:
   - bélyegképek
   - modelloldal
@@ -183,7 +183,7 @@
 - [x] Dokumentáció: `MUKODES.md`, `TESZT.md`, `CLAUDE.md`, `HowToUse.pdf`; prezentáció: `presentation/prezentacio.pdf`
 - [ ] Alkatrészek, korong nyomtatása
 - [ ] Otthoni próbaszkennelés, futásidő mérése
-- [ ] Hosting beállítása
+- [x] Hosting beállítása: https://r3dy-web.vercel.app (2026-11-21)
 - [ ] Csapattárs meghívása
 - [ ] 2–3 demómodell
 - [x] Claude API-kulcs, a kulcs a `.env`-ben (git-ignorálva)
@@ -204,7 +204,10 @@ r3Dy/
 
 ## 11. Beüzemelés / újraépítés
 - Szabályok: magyar felület és dokumentáció, angol kódkomment; titkok nem kerülnek a repóba
-- Külső erőforrások leltára: _TBD_
+- Külső erőforrások leltára:
+  - GitHub: `molnaristud-arch/r3Dy` (privát), csapattárs írási joggal
+  - Vercel: csapat `is2`, projekt `r3dy-web`, Root Directory `web` → https://r3dy-web.vercel.app
+  - Claude API: kulcs a git-ignorált `.env`-ben (`ANTHROPIC_API_KEY`); modellek: Opus 5.5 (vezérlő), Sonnet 5.5 (minőségellenőrző)
 - Új gépen: klón → apt csomagok → micromamba → `./setup.sh` → mintafuttatás
 - Elfogadási lista:
   - [ ] `setup ok`

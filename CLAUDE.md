@@ -26,8 +26,8 @@ Repó: `github.com/molnaristud-arch/r3Dy` (privát), ág `main`. Ebben a mappáb
 - `pipeline/reconstruct.sh` – COLMAP (jellemzőpontok, exhaustive matching, mapper, `model_orientation_aligner --method IMAGE-ORIENTATION`, undistort) → OpenMVS (Densify, ReconstructMesh, TextureMesh) → `<scan>/model/model.obj`.
 - `blender/run.sh cleanup|preview …` – a Blender-szkriptek indítója (`--python-exit-code 1`, különben a Blender mindig 0-val lép ki). `cleanup.py`: import (`--up NEGATIVE_Y`), legnagyobb darab, decimálás, lépték (`--size` m), talp az origóban, GLB (+ `--blend`). `preview.py`: N nézet PNG-be.
 - `pipeline/publish.py` – GLB (+ .blend) → `web/models/<slug>.glb`, bejegyzés a `models.json`-ba.
-- `pipeline/auto.sh` – **tartalék**, fix sorrendű lánc ágens nélkül (`--watch`, `--size`, `--mask`, `--frames`, `--no-ai`, …); a végén `agent/qa.py`-tól kér javaslatot. Az élő oldal címe a `SITE` környezeti változóból jön (üres = nem várja meg az élesítést).
-- `web/` – statikus oldal, `<model-viewer>@4.0.0`; Vercel Root Directory `web`, minden push a `main`-re élesít.
+- `pipeline/auto.sh` – **tartalék**, fix sorrendű lánc ágens nélkül (`--watch`, `--size`, `--mask`, `--frames`, `--no-ai`, …); a végén `agent/qa.py`-tól kér javaslatot. Az élő oldal címe a `SITE` környezeti változó (alap: https://r3dy-web.vercel.app; üres = nem várja meg az élesítést).
+- `web/` – statikus oldal, `<model-viewer>@4.0.0`. Éles: **https://r3dy-web.vercel.app** (Vercel-projekt `r3dy-web`, csapat `is2`, Root Directory `web`, preset Other); minden push a `main`-re élesít, csak a `web/` megy ki (ellenőrizve: `/TERV.md`, `/.env` → 404).
 - `presentation/` – demóprezentáció (`deck.json`, `deck.css`, `slides/*.html`); `python3 presentation/build.py --pdf` → `prezentacio.html` + `.pdf` (headless Chrome).
 - `docs/howto/HowToUse.html` → `HowToUse.pdf` (`./docs/howto/build.sh`, headless Chrome). Parancs vagy kimenet változásakor frissítsd.
 - `data/` – git-ignorált, **kivéve** `data/sample/` (11 kép, **AGPL** – belőle készült modellt soha ne publikálj; a `publish_model` md5 alapján tiltja).

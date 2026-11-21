@@ -2,6 +2,8 @@
 
 Forgóasztalon körbefotózott tárgyból textúrázott 3D modell. A feldolgozást **AI ágensek vezérlik**: a fotogrammetriás lánc lépései az eszközeik, és minden lépés után ők döntenek a folytatásról. Részletek: [TERV.md](TERV.md).
 
+**Élő oldal:** https://r3dy-web.vercel.app
+
 ## Telepítés (Ubuntu, NVIDIA GPU)
 
 ```bash

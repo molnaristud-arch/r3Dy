@@ -307,7 +307,7 @@ Ezután:
 ### 3.9 Weboldal és élesítés
 
 - **GitHub** (privát repó): a teljes projekt. A `data/` (fotók, köztes fájlok) **nincs** benne (`.gitignore`) – túl nagy, és nem kell; a `.env` (API-kulcs) sincs.
-- **Vercel**: minden `main`-re érkező push után **automatikusan élesít**, ~20 másodperc alatt. Csak a **`web/` mappa** megy ki (Root Directory), így a kód, a terv és a dokumentáció nem nyilvános.
+- **Vercel** (https://r3dy-web.vercel.app): minden `main`-re érkező push után **automatikusan élesít**, ~20 másodperc alatt. Csak a **`web/` mappa** megy ki (Root Directory), így a kód, a terv és a dokumentáció nem nyilvános.
 - **`web/index.html`**: betölti a `models.json`-t, és minden modellhez kártyát rajzol: `<model-viewer>` (forgatható, automatikusan forgó, AR, lusta betöltés), név, méret, háromszögszám, leírás, címkék, **GLB és .blend letöltés**, keresés név/leírás/címke szerint, világos/sötét téma (a rendszer beállítását követi). Külön szerver vagy adatbázis nincs: a „háttérrendszer” maga a git-repó.
 
 ### 3.10 Mappák egy feldolgozás után
