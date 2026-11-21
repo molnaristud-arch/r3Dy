@@ -1,5 +1,13 @@
 # r3Dy
 
+> **English summary (Agentic AI Hackathon 2026, team DIsc – Kozma Dávid, Molnár István)**
+>
+> r3Dy turns a real object into a textured, true-size 3D model on a public website. An Arduino turntable (Nano + ULN2003 + stepper) rotates the object in 10° steps while a phone takes ~72 photos; photogrammetry (COLMAP + OpenMVS, CUDA) and Blender build the model. **The pipeline is run by AI agents, not a fixed script:** a *controller agent* (Claude Opus 5.5, tool use – `agent/controller.py`) calls each step as a tool, reads the result (registered-image ratio, error class, preview renders) and decides the next step – retry with background masking, smaller images, another orientation, or publish. An independent *quality-check agent* (Claude Sonnet 5.5, structured JSON – `agent/qa.py`) compares the renders with a real photo, gives a verdict and writes the name, description and tags.
+>
+> - **Pitch deck:** [presentation/r3Dy-pitch.pptx](presentation/r3Dy-pitch.pptx) · **Live site:** https://r3dy-web.vercel.app
+> - **Real runs with the agents' decision logs:** [examples/](examples/)
+> - Detailed docs (Hungarian): plan `TERV.md`, how it works `MUKODES.md`, test `TESZT.md`, user guide `HowToUse.pdf`.
+
 Forgóasztalon körbefotózott tárgyból textúrázott 3D modell. A feldolgozást **AI ágensek vezérlik**: a fotogrammetriás lánc lépései az eszközeik, és minden lépés után ők döntenek a folytatásról. Részletek: [TERV.md](TERV.md).
 
 **Élő oldal:** https://r3dy-web.vercel.app
@@ -36,6 +44,8 @@ A `--publish` nélkül az ágens nem tölt fel semmit. A `data/sample` tesztkés
 - [TESZT.md](TESZT.md) – teljes teszt elvárt kimenetekkel
 - [HowToUse.pdf](HowToUse.pdf) – használati útmutató (forrás: `docs/howto/`)
 - [presentation/prezentacio.pdf](presentation/prezentacio.pdf) – demóprezentáció (forrás: `presentation/`, `build.py --pdf`)
+- [presentation/r3Dy-pitch.pptx](presentation/r3Dy-pitch.pptx) – angol pitch (6 dia, a beadáshoz)
+- [examples/](examples/) – valódi szkennelések: az ágensek döntési naplója, ítélete, előnézetek
 
 ## Felépítés
 

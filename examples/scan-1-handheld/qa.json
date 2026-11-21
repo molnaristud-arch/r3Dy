@@ -1,0 +1,22 @@
+{
+  "nev": "Arduino Uno forgótányéron",
+  "leiras": "Kék Arduino Uno mikrokontroller-fejlesztőlap fekete USB-csatlakozóval és fekete IC-foglalattal, kerek, szögskálás kartonkorongra ragasztva. A korong fehér, sűrű fekete foltmintázattal van nyomtatva, a szélén fekete ragasztószalag-darabok és egy narancssárga jelölés látszik.",
+  "cimkek": [
+    "arduino",
+    "panel",
+    "elektronika",
+    "mikrokontroller",
+    "korong"
+  ],
+  "minoseg": "gyanus",
+  "hibak": [
+    "A modell erősen lapított, a korong és a lap ferdén, vékony lemezként jelenik meg.",
+    "A korong széle hullámos, szakadozott, fehéres foltok tapadnak rá.",
+    "Az Arduino lap kis részletei (alkatrészek, csatlakozók) elmosódottak és torzak.",
+    "A textúra a korongon foltos, a szögskála és a számok nem olvashatók.",
+    "Az alja fekete, zajos, egyenetlen."
+  ],
+  "javaslat": "Egyenletesebb megvilágítással, a háttér kivágásával és további fotókkal különböző magasságból (plusz kör felülről) lehetne pontosabb, nem lapított geometriát kapni.",
+  "model": "claude-sonnet-5-5",
+  "size_cm": "16.4 × 19.0 × 12.3 cm"
+}

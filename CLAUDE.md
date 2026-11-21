@@ -15,6 +15,7 @@ Repó: `github.com/molnaristud-arch/r3Dy` (privát), ág `main`. Ebben a mappáb
 - `tools.py` – az eszközök (sémák: `TOOL_SCHEMAS`, megvalósítás: `IMPLS`). Mindegyik egyetlen, induláskor rögzített `data/` alatti mappán dolgozik; a teljes kimenet a `<scan>/agent_run.log`-ba megy, a modell rövid JSON-t (+ képeket) kap. Kézi teszt API nélkül: `.venv/bin/python agent/tools.py data/<scan> <eszköz> '<json>'`.
 - `qa.py` – **minőségellenőrző + kurátor ágens** (Claude Sonnet 5.5, `QA_MODEL` env-vel felülírható, JSON-séma structured outputtal): `nev`, `leiras`, `cimkek`, `minoseg` (jo|gyanus|hibas), `hibak`, `javaslat` (+ `model`, `size_cm`). A vezérlő `quality_check` eszköze és az `auto.sh` is ezt hívja. Kilépési kód: 1 nincs beállítva / nincs előnézet, 2 hibás válasz, 3 nem érhető el.
 - Kulcs: `ANTHROPIC_API_KEY` a környezetből vagy a git-ignorált `.env`-ből (`controller.load_env`). A `.env`-et soha ne commitold, a kulcsot ne írd ki.
+- `export_example.py <scan> <név>` – egy kész szkennelés ágensnaplóját, ítéletét és előnézeteit az `examples/<név>/`-be másolja, a helyi útvonalakat kicserélve (fotók nélkül).
 - Új eszköz: séma a `TOOL_SCHEMAS`-ba, függvény az `IMPLS`-be, hívási korlát a `MAX_CALLS`-ba, használati támpont a `SYSTEM_PROMPT`-ba, leírás a `MUKODES.md` 3.3-ba.
 
 ## Lánc és fájlok
