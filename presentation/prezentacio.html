@@ -161,23 +161,23 @@ table.plain td, table.plain th { padding: .5em .6em; border-bottom: 2px solid #0
 </section>
 <section id="hardware" class="light">
 <p class="eyebrow">Hardver</p>
-<h2>Egy barkácsolt forgóasztal, ami magától fotóztat</h2>
+<h2>Egy barkácsolt, motoros forgóasztal</h2>
 <div class="cards cols-4">
 <div class="card rise" style="--i:0">
 <h3>Nyomtatott korong</h3>
 <p class="body">10°-os beosztás és véletlen minta: kapaszkodó a programnak.</p>
 </div>
 <div class="card rise" style="--i:1">
-<h3>Ventilátor mint csapágy</h3>
-<p class="body">Áram nélküli PC-ventilátor: sima, stabil forgás.</p>
+<h3>Arduino Nano + ULN2003</h3>
+<p class="body">Lépteti a motort, és jelzi a soros monitoron: „FOTO k/36”.</p>
 </div>
 <div class="card rise" style="--i:2">
-<h3>Arduino + léptető</h3>
-<p class="body">28BYJ-48 motor: pontosan 10°-ot fordul, megáll, sípol.</p>
+<h3>5 V léptetőmotor</h3>
+<p class="body">28BYJ-48: pontosan 10°-ot fordul, megáll, a tárgy nem rezeg.</p>
 </div>
 <div class="card rise" style="--i:3">
 <h3>Telefon</h3>
-<p class="body">Open Camera: a sípszóra exponál. Nincs kábel a telefonig.</p>
+<p class="body">Rögzítve áll, minden megállásnál mi exponálunk – zárolt fókusszal.</p>
 </div>
 </div>
 <div class="cycle rise" style="--i:5">
@@ -185,13 +185,13 @@ table.plain td, table.plain th { padding: .5em .6em; border-bottom: 2px solid #0
 <svg class="xarrow" width="36" height="20" viewBox="0 0 36 20" aria-hidden="true"><path d="M0 6h22V0l14 10-14 10v-6H0z" fill="currentColor"/></svg>
 <p class="pill">0,6 s nyugalom</p>
 <svg class="xarrow" width="36" height="20" viewBox="0 0 36 20" aria-hidden="true"><path d="M0 6h22V0l14 10-14 10v-6H0z" fill="currentColor"/></svg>
-<p class="pill hot">sípszó → fotó</p>
+<p class="pill hot">kézi fotó</p>
 <svg class="xarrow" width="36" height="20" viewBox="0 0 36 20" aria-hidden="true"><path d="M0 6h22V0l14 10-14 10v-6H0z" fill="currentColor"/></svg>
 <p class="pill">2,5 s állás</p>
 <svg class="xarrow" width="36" height="20" viewBox="0 0 36 20" aria-hidden="true"><path d="M0 6h22V0l14 10-14 10v-6H0z" fill="currentColor"/></svg>
 <p class="pill">36× = egy kör, ~2 perc</p>
 </div>
-<aside>A korong mintája együtt forog a tárggyal, és rengeteg felismerhető pontot ad. A ventilátor motornak nem jó (300 RPM-en elmosódna minden), de áram nélkül kiváló csapágy. Az Arduino lépteti a motort, és minden megállásnál sípol – az Open Camera hangvezérlése erre készít fotót. Egy kör 36 fotóval kb. 2 perc, kéz nélkül.</aside>
+<aside>A korong mintája együtt forog a tárggyal, és rengeteg felismerhető pontot ad. Az Arduino Nano egy ULN2003 meghajtón keresztül lépteti az 5 V-os motort: 10°, rövid nyugalom, megállás. Amíg a tányér áll, kézzel készítjük a fotót a rögzített telefonnal. Egy kör 36 fotóval kb. 2 perc, két kör két magasságból.</aside>
 </section>
 <section id="triangulation" class="dark">
 <p class="eyebrow">Elmélet · 1</p>
@@ -360,7 +360,7 @@ table.plain td, table.plain th { padding: .5em .6em; border-bottom: 2px solid #0
 <p class="eyebrow">Élő demó</p>
 <h1 class="rise" style="--i:0">Fotó → 3D → web</h1>
 <div style="display:flex; flex-direction:column; gap:20px; margin-top:56px">
-<p class="lead rise" style="--i:2">1 · A motor körbeforgatja a tárgyat, a telefon minden sípszóra fotóz.</p>
+<p class="lead rise" style="--i:2">1 · A motor 10°-onként forgatja a tárgyat, minden megállásnál fotózunk.</p>
 <p class="lead rise" style="--i:3">2 · A képek a laptopra kerülnek – a vezérlő ágens dolgozik, a döntései élőben látszanak.</p>
 <p class="lead rise" style="--i:4">3 · A kész modell megjelenik az oldalon:</p>
 </div>

@@ -155,7 +155,7 @@ A videóból a program **egyenletes időablakokra** bontva ablakonként a **leg�
 
 A **28BYJ-48** léptetőmotor tekercseit meghatározott sorrendben kapcsolgatva a tengely apró, pontos lépésekben fordul. Félléptetéses üzemben a motor 64 lépést tesz egy fordulatra, a beépített **1 : 63,68 áttétel** után a kimenő tengely **≈ 4076 lépés/fordulat** – így 10° ≈ 113 lépés, ~0,09° pontossággal. Az áttétel miatt áram nélkül is megtartja a helyzetét, és erős, de lassú (max. ~10–15 fordulat/perc) – pont amilyen egy forgóasztalhoz kell.
 
-A telefon **exponálását hang indítja**: a motor megállás után sípol, az Open Camera „hangos zajra exponál” funkciója erre fényképez. Így nincs szükség kábelre vagy elektronikára a telefon felé.
+A telefont **kézzel exponáljuk**: a motor minden 10°-os lépés után megáll, és amíg áll, valaki elkészíti a fotót. A soros monitor `FOTO k/36` sora jelzi a megállást. Így a telefon felé nem kell semmilyen kábel vagy elektronika. (A vázlat megálláskor a D7-re egy sípszót is kiad – egy oda kötött zümmerrel az Open Camera hangvezérlése automatikusan exponálhatna –, de ezt nem használjuk; zümmer nélkül ennek nincs hatása.)
 
 ---
 
@@ -166,8 +166,8 @@ A telefon **exponálását hang indítja**: a motor megállás után sípol, az 
 | elem | konkrétan |
 |---|---|
 | feldolgozó gép | MSI GP65: i7-10750H, 16 GB RAM, **RTX 2060 6 GB** (CUDA), Ubuntu 26.04 |
-| telefon | Android, **Open Camera** (kézi fókusz-, expozíció-, fehéregyensúly-zár; hangvezérelt exponálás) |
-| forgóasztal | tányér / forgótálca vagy áram nélküli PC-ventilátor mint csapágy + nyomtatott korong (`capture/disc_a4.svg`); opcionálisan Arduino + 28BYJ-48 |
+| telefon | Android (**Open Camera**) vagy iPhone (beépített Kamera, AE/AF-zárral) – fókusz és expozíció zárolva, **kézi exponálás** minden megállásnál |
+| forgóasztal | **Arduino Nano + ULN2003 + 28BYJ-48 (5 V) léptetőmotor**, 10°-os lépésekkel; a tányéron a nyomtatott korong (`capture/disc_a4.svg`) |
 | COLMAP 4.2.1, OpenMVS 2.4.0 | **CUDA-s** változat, a micromamba `scan` környezetben (az Ubuntu `colmap` csomagja hibás, és GPU nélküli) |
 | Blender 5.0.1 | parancssorból (`-b`), a projekt `.venv`-jéből kölcsönzött numpy-val (a glTF-exporthoz kell) |
 | Python `.venv` | OpenCV (videó, élesség), rembg + onnxruntime (háttérkivágás GPU-n) |
@@ -177,12 +177,12 @@ Telepítés és ellenőrzés: `./setup.sh` (idempotens – hiányzó elemnél ki
 
 ### 3.2 Felvétel
 
-**Kézi léptetés (A mód):** a telefon megtámasztva, ~40–50 cm-re; a tányért 10°-onként forgatod, minden megállásnál exponálsz → 36 kép/kör; két kör (≈20° és ≈45° magasságból) → **72 kép**. Az Open Camerában a fókusz, az expozíció és a fehéregyensúly **zárolva**: így minden képen ugyanolyan a tárgy színe és élessége, ami a párosításnak (2.3) és a textúrának (2.10) is kell.
+**Motoros léptetés, kézi exponálás (a használt mód):** a telefon rögzítve (állvány, tartó vagy könyvkupac), ~40–50 cm-re; az Arduino 10°-onként forgat és megáll, mi minden megállásnál exponálunk → 36 kép/kör; két kör (≈20° és ≈45° magasságból) → **~72 kép**. Ha egy-két kép kimarad vagy duplán készül, nem baj: a szoftver a képekből számolja a helyzetüket, nem a darabszámból. Motor nélkül ugyanez kézi forgatással is megy. Az Open Camerában a fókusz, az expozíció és a fehéregyensúly **zárolva**: így minden képen ugyanolyan a tárgy színe és élessége, ami a párosításnak (2.3) és a textúrának (2.10) is kell.
 
 **Arduino-léptetés:** `capture/turntable_stepper/turntable_stepper.ino`. Egy *állapotgép* fut a `loop()`-ban, megakadás nélkül (a gomb és a soros parancsok bármikor hatnak):
 
 ```
-IDLE ──s/gomb──► SETTLE (0,6 s várakozás) ──► sípszó, „FOTO k/36” ──► DWELL (2,5 s áll)
+IDLE ──s/gomb──► SETTLE (0,6 s várakozás) ──► „FOTO k/36” → itt exponálunk ──► DWELL (2,5 s áll, d-vel állítható)
                     ▲                                                     │
                     └──── MOVE: 10° (lassú indulás és fékezés, ~0,3 s) ◄──┘   36 után ─► IDLE
 IDLE ──c──► CONT: folyamatos forgás, lépésköz = 60 s / (RPM × 4076)

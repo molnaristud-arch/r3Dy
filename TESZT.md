@@ -3,9 +3,9 @@
 ## Hogyan működik most
 
 ```
- [forgóasztal: kézi / Arduino]   [telefon, Open Camera]          [laptop]
-  10°-ot fordul, megáll       →   exponál (kézzel / sípszóra) →   USB: DCIM/… → data/bejovo/
-                                  (vagy videó 1 RPM-nél)                     │
+ [forgóasztal: Arduino Nano]     [telefon, rögzítve]             [laptop]
+  10°-ot fordul, megáll       →   mi exponálunk kézzel     →     USB: DCIM/… → data/bejovo/
+  ("FOTO k/36")                   minden megállásnál                         │
                                                                              ▼
                       .venv/bin/python agent/controller.py --inbox --size 0.24
                         vezérlő ágens (Claude): minden lépés után dönt
@@ -25,12 +25,12 @@ A teszt öt szintből áll. Egymásra épülnek: ha egy szint nem megy, javíts�
 | szint | mit ellenőriz | kell hozzá | idő |
 |---|---|---|---|
 | 1 | a szoftverlánc és az ágensek a gépen | csak a laptop + API-kulcs | 10 perc |
-| 2 | motor + Arduino | Arduino, motor, zümmer | 10 perc |
-| 3 | telefon exponál a sípszóra | + telefon | 5 perc |
+| 2 | motor + Arduino | Arduino Nano, ULN2003, motor | 10 perc |
+| 3 | próbakör kézi exponálással | + telefon | 5 perc |
 | 4 | **teljes szkennelés a weboldalig** | minden + egy tárgy | 30–45 perc |
 | 5 | **az önjavító kör** (a demó kulcsjelenete) | szándékosan rossz szkennelések | 30–60 perc |
 
-A 2–3. szint kihagyható, ha kézzel forgattok és exponáltok.
+A 2–3. szint kihagyható, ha motor nélkül, kézzel forgattok.
 
 ---
 
@@ -67,7 +67,7 @@ Arduino IDE → Serial Monitor, 115200 baud, „Newline”:
 | (feltöltés után) | `Forgoasztal kesz. Gomb vagy 's' = …` |
 | `?` | `mod=IDLE n=36 d=2500 r=1.00 b=1 foto=0` |
 | `n4` majd `d1000` | `n=4`, `d=1000` az állapotsorban |
-| `s` | 4 megállás, 90°-onként: `FOTO 1/4` … `FOTO 4/4`, mindegyiknél egy rövid sípszó, majd `KESZ: egy teljes kor…` |
+| `s` | 4 megállás, 90°-onként: `FOTO 1/4` … `FOTO 4/4`, majd `KESZ: egy teljes kor…` (sípszó csak zümmerrel lenne – nálunk nincs) |
 | `c` | `START: folyamatos, 1.00 RPM`. **A szalagjel pontosan 60 s (±1 s) alatt ér körbe.** |
 | `x` | `STOP`, a tányér azonnal megáll |
 | gomb | megnyomva elindul a léptető mód, újra megnyomva leáll (`STOP (gomb)`) |
@@ -77,17 +77,16 @@ Arduino IDE → Serial Monitor, 115200 baud, „Newline”:
 
 ---
 
-## 3. szint – a telefon exponál a sípszóra
+## 3. szint – próbakör kézi exponálással
 
-1. Open Camera: Beállítások → Távvezérlés → Hangvezérlés → **Zaj**. A kamera képernyőjén koppints a **mikrofon ikonra**.
-2. Ugyanaz a beállítás, mint a valódi szkennelésnél: legnagyobb felbontás, zárolt fókusz (Locked), zárolt expozíció, fix fehéregyensúly (Daylight), HDR és vaku kikapcsolva.
-3. Serial Monitorban: `n4`, majd `s`.
+1. A telefon rögzítve (állvány / tartó / könyvkupac), 40–50 cm-re, kb. 20°-kal a tárgy fölött.
+2. Ugyanaz a beállítás, mint a valódi szkennelésnél: legnagyobb felbontás, zárolt fókusz és expozíció, fix fehéregyensúly, HDR, vaku, éjszakai mód kikapcsolva, 1× zoom. iPhone-on JPG formátum (Beállítások → Kamera → Formátumok → Legkompatibilisebb).
+3. Serial Monitorban: `n4`, majd `s`. **Minden megállásnál** (`FOTO k/4`): fél másodperc várakozás, majd egy finom érintés az exponálógombon.
 
-**Elvárt eredmény:** pontosan **4 új fotó** a `DCIM/OpenCamera` mappában, mindegyik éles, és a tányér mindegyiken más szögben áll.
+**Elvárt eredmény:** **4 új fotó**, mindegyik éles, a tárgy mindegyiken ugyanott van a képen, és a tányér mindegyiken más szögben áll.
 
-- **Kevesebb fotó:** a zümmert tedd közelebb a telefonhoz, vagy növeld az érzékenységet.
-- **Több fotó** (beszédre is exponál): csökkentsd az érzékenységet, és legyen csend.
-- **Ha nem sikerül:** `d6000` (6 s-os állás), és fotózz kézzel vagy Bluetooth-os távkioldóval.
+- **Elmosódott kép / elmozdult a telefon az érintéstől:** 2 s-os önkioldó a kamerában, és hosszabb állás: `d4000`; vagy hangerőgomb / távkioldó.
+- **Nem érsz oda időben:** `d4000`–`d6000` (a Nano újraindítás után visszaáll 2,5 s-ra, ezért minden bekapcsolás után add ki újra).
 
 Ha megvan: `n36`.
 
@@ -104,11 +103,11 @@ Ha megvan: `n36`.
 
 ### 4.2 Fotózás
 
-1. **1. kör:** 36 fotó, 10°-onként (kézzel forgatva, vagy Serial Monitorban `s`).
+1. **1. kör:** Serial Monitorban `s` → 36 megállás, **mindegyiknél egy fotó kézzel**. (Motor nélkül: kézzel forgatva 10°-os jelenként.)
 2. Emeld a telefont kb. 45°-ra, **ugyanabban a tájolásban** (álló vagy fekvő), mint az első körben. **2. kör:** újabb 36 fotó.
-3. A kezed ne legyen a képen.
+3. A kezed ne legyen a képen, és a telefont az érintésen kívül ne mozdítsd. Egy-két kihagyott vagy dupla kép nem baj.
 
-**Elvárt eredmény:** 72 új, éles fotó a telefonon.
+**Elvárt eredmény:** kb. 72 új, éles fotó a telefonon.
 
 ### 4.3 Átmásolás
 
@@ -188,8 +187,8 @@ Ez mutatja meg, hogy az ágens nem csak lefuttat egy szkriptet, hanem **észreve
 | # | feltétel | megfelelt |
 |---|---|---|
 | 1 | a mintán az ágens `KÉSZ`-szel zár, álló kastély | ☐ |
-| 2 | a motor 10°-onként lép, sípol, és 1 RPM-en 60 s egy kör | ☐ |
-| 3 | 4 sípszóra 4 fotó | ☐ |
+| 2 | a motor 10°-onként lép és megáll, 1 RPM-en 60 s egy kör | ☐ |
+| 3 | a próbakörben 4 megállásnál 4 éles, kézzel exponált fotó | ☐ |
 | 4 | 72 fotóból `KÉSZ`, a futásidő feljegyezve: ____ perc | ☐ |
 | 5 | az előnézeten a tárgy áll és felismerhető, a quality_check „jo” | ☐ |
 | 6 | a modell kint van az oldalon, helyes mérettel, forgatható | ☐ |

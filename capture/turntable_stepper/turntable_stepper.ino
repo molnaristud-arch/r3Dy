@@ -1,8 +1,9 @@
 // Turntable driver: 28BYJ-48 stepper + ULN2003 board on an Arduino Uno/Nano.
 //
 // Two modes:
-//   STEP (default): rotate 360/N degrees, wait until the platform is still, beep (so Open Camera's
-//                   "loud noise" audio trigger takes the photo), hold still for DWELL ms, repeat N times.
+//   STEP (default): rotate 360/N degrees, wait until the platform is still, print "FOTO k/N" and beep,
+//                   hold still for DWELL ms (the photo is taken by hand meanwhile), repeat N times.
+//                   The beep is optional: with no buzzer on D7 it does nothing.
 //   CONT:           continuous rotation at RPM (for video mode; ~1 RPM recommended).
 //
 // Controls: push button on pin 2 (to GND) = start STEP / stop.  Serial monitor at 115200 baud:
@@ -10,7 +11,7 @@
 //   n36 = stops per turn   d2500 = dwell ms   r1.0 = RPM in CONT   b0 / b1 = beep off / on
 //
 // Wiring: ULN2003 IN1..IN4 → D8..D11, board + → 5V, - → GND (USB power is enough for one 28BYJ-48).
-//         Piezo buzzer (active or passive) + → D7, - → GND.  Button: D2 ↔ GND.
+//         Optional piezo buzzer + → D7, - → GND (not used by us).  Button: D2 ↔ GND (optional).
 // See README.md next to this file.
 
 const uint8_t COIL_PINS[4] = {8, 9, 10, 11};

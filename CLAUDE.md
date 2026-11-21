@@ -21,7 +21,7 @@ Repó: `github.com/molnaristud-arch/r3Dy` (privát), ág `main`. Ebben a mappáb
 ## Lánc és fájlok
 
 - `capture/turntable_disc.py` – nyomtatható korong (SVG): 10°-os fokbeosztás + véletlen mintázat (a COLMAP-nak) + 5 cm-es skála.
-- `capture/turntable_stepper/` – Arduino-vázlat (28BYJ-48 + ULN2003, D8–D11, zümmer D7, gomb D2): léptető és folyamatos mód. Arduino-fordító nincs a gépen: `capture/stepper_sim/run.sh` g++-szal szimulálja – a vázlat változtatása után futtasd.
+- `capture/turntable_stepper/` – Arduino-vázlat (Nano + ULN2003 + 28BYJ-48, D8–D11; opcionális zümmer D7 és gomb D2): léptető és folyamatos mód. **A használt felvételi mód: a motor 10°-onként megáll, és minden megállásnál kézzel exponálunk – zümmer nincs.** A vázlat a sípszót ettől még kiadja (a szimulátor erre méri a megállásokat), zümmer nélkül hatástalan. Arduino-fordító nincs a gépen: `capture/stepper_sim/run.sh` g++-szal szimulálja – a vázlat változtatása után futtasd.
 - `pipeline/extract_frames.py` – videóból egyenletes időközönként a legélesebb kocka (Laplace-szórás), ablakonként azonnal kiírva.
 - `pipeline/mask.py` – háttér kivágása (`rembg`, GPU) → `<scan>/masked`; ha létezik, a `reconstruct.sh` ezt használja.
 - `pipeline/reconstruct.sh` – COLMAP (jellemzőpontok, exhaustive matching, mapper, `model_orientation_aligner --method IMAGE-ORIENTATION`, undistort) → OpenMVS (Densify, ReconstructMesh, TextureMesh) → `<scan>/model/model.obj`.

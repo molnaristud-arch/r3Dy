@@ -1,6 +1,8 @@
 # Motoros forgóasztal – 28BYJ-48 léptetőmotor + Arduino
 
-A kézi forgatás helyett a motor 10°-onként lép, megáll, sípol, és a telefon a sípszóra exponál (Open Camera hangvezérlés). Folyamatos módban 1 RPM-mel forog a videós felvételhez.
+A motor 10°-onként lép és megáll; **minden megállásnál kézzel exponálunk** (a soros monitor `FOTO k/36` sora jelzi a megállást). Zümmer nincs és nem is kell. Folyamatos módban 1 RPM-mel forog a videós felvételhez.
+
+**A mi összeállításunk:** Arduino Nano + ULN2003 meghajtópanel + 28BYJ-48 5 V léptetőmotor.
 
 ## Alkatrészek (~3–5 000 Ft)
 
@@ -8,7 +10,7 @@ A kézi forgatás helyett a motor 10°-onként lép, megáll, sípol, és a tele
 |---|---|---|
 | 1 | 28BYJ-48 5 V léptetőmotor + ULN2003 meghajtópanel | általában együtt árulják |
 | 1 | Arduino Uno vagy Nano (klón is jó) + USB-kábel | |
-| 1 | piezo zümmer (aktív vagy passzív) | a fotó indításához |
+| (1) | piezo zümmer | **nem használjuk** – csak automatikus, hangvezérelt exponáláshoz kellene |
 | 1 | nyomógomb | opcionális – soros monitorról is vezérelhető |
 | ~8 | anya–anya / apa–anya jumper kábel | |
 
@@ -19,8 +21,8 @@ ULN2003 IN1 → D8      ULN2003 +  → 5V
 ULN2003 IN2 → D9      ULN2003 -  → GND
 ULN2003 IN3 → D10     motor 5 eres csatlakozója → ULN2003 aljzat (csak egy irányban megy be)
 ULN2003 IN4 → D11
-zümmer +    → D7      zümmer -   → GND
-gomb        → D2 és GND között (belső felhúzó ellenállás, nem kell külön)
+gomb        → D2 és GND között (opcionális; belső felhúzó ellenállás, nem kell külön)
+(zümmer      → D7 és GND – nincs bekötve; a program sípszója nélküle hatástalan)
 ```
 
 Egy motorhoz elég az USB-táp (a motor ~250 mA-t vesz fel).
@@ -36,24 +38,25 @@ Egy motorhoz elég az USB-táp (a motor ~250 mA-t vesz fel).
 
 | parancs (soros monitor) | gomb | hatás |
 |---|---|---|
-| `s` | megnyom | léptető mód: 36 megállás 10°-onként, mindegyiknél sípszó → fotó |
+| `s` | megnyom | léptető mód: 36 megállás 10°-onként – **mindegyiknél egy fotó kézzel** |
 | `c` | – | folyamatos forgás (`r` RPM, alap 1.0) – videós módhoz |
 | `x` | megnyom futás közben | stop |
 | `?` | – | állapot |
 | `n36` | – | megállások száma körönként (4–360) |
 | `d2500` | – | ennyi ms-ig áll minden megállásnál (300–60000) |
 | `r1.0` | – | RPM folyamatos módban (max 10) |
-| `b0` / `b1` | – | sípszó ki / be |
+| `b0` / `b1` | – | sípszó ki / be (zümmer nélkül mindegy) |
 
-Egy megállás: lassan induló és lassan fékező 10°-os elfordulás (~0,3 s) → 0,6 s várakozás, hogy a tárgy ne rezegjen → **sípszó (itt exponál a telefon)** → 2,5 s állás. **Egy kör 36 fotóval ~2 perc.** Kör végén megáll; emeld meg a telefont, és indítsd újra a második körhöz.
+Egy megállás: lassan induló és lassan fékező 10°-os elfordulás (~0,3 s) → 0,6 s várakozás, hogy a tárgy ne rezegjen → **`FOTO k/36` – itt exponálunk** → 2,5 s állás. **Egy kör 36 fotóval ~2 perc.** Kör végén megáll; emeld meg a telefont, és indítsd újra a második körhöz.
 
-## Telefon: exponálás sípszóra (Open Camera)
+A Nano bekapcsoláskor az alapértékekkel indul (`n36`, `d2500`): ha kényelmesebb tempó kell, minden indítás után add ki pl. a `d4000` parancsot.
 
-1. Open Camera → Beállítások → **Távvezérlés** (Remote controls) → **Hangvezérlés** (Audio control) → **Zaj** (Loud noise). Az érzékenységet állítsd közepesre / magasra.
-2. A kamera képernyőn megjelenik egy **mikrofon ikon**: koppints rá, ekkor kezd figyelni (az ikon pirosra vált).
-3. Próba: `s` → minden sípszónál kattan a telefon. Ha nem: zümmert közelebb a telefonhoz, érzékenység feljebb. Ha két fotót készít egy sípszóra vagy beszédre is exponál: érzékenység lejjebb, a szoba legyen csendes.
+## Telefon: kézi exponálás
 
-(A menüpontok neve verziónként kicsit eltérhet. Ha a hangvezérlés nem megy, a `d6000` hosszabb állással kézzel / Bluetooth-os távkioldóval is kényelmesen lehet fotózni.)
+1. **A telefon legyen rögzítve** (állvány, tartó vagy könyvkupac), 40–50 cm-re, az 1. körben ~20°-kal, a 2. körben ~45°-kal a tárgy fölött; tájolás (álló/fekvő) a két körben azonos.
+2. **Fókusz és expozíció zárolva** (Open Camera: *Locked* + AE lock; iPhone: hosszan nyomva a tárgyra → „AE/AF ZÁR”), legnagyobb felbontás, HDR, vaku, éjszakai mód ki, 1× zoom. iPhone-on a formátum JPG legyen (Beállítások → Kamera → Formátumok → Legkompatibilisebb).
+3. **Exponálás minden megállásnál:** a tányér megáll → fél másodperc → egy érintés. A telefont ne told el; ha az érintés megmozdítja, használj 2 s-os időzítőt (és `d4000`-et), vagy a hangerőgombot / távkioldót.
+4. **Nem kell pontosan 36 kép körönként:** egy kihagyott vagy dupla kép nem baj, a szoftver a képek tartalmából számolja a helyzetüket.
 
 ## Mechanika
 

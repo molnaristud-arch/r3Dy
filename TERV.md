@@ -77,13 +77,12 @@
 - nincs backend
 
 ## 3. Hardver
-- [ ] Bevásárlólista: forgó alap, tányér, nyomtatott korong (100%), háttér, 2 lámpa + szóró, állvány, BT exponáló
+- [x] Forgóasztal: Arduino Nano + ULN2003 + 5 V léptetőmotor, 10°-os lépések (zümmer nincs, kézzel exponálunk)
+- [ ] Kellékek: nyomtatott korong (100%), háttér, 2 lámpa + szóró, telefontartó / állvány
 - [ ] Asztal összerakása (korong középen, fix jel, íves háttér, 45°-os fények)
 - [ ] Telefon: fókusz/expozíció/fehéregyensúly zárolva, max felbontás, stabilizálás ki
-- Felvétel:
-  - A mód: fotó 10°-onként, 2–3 magasság, 80–110 kép
-  - B mód: videó, ~1 fordulat/perc
-- Opcionális: léptetőmotor + Arduino
+- Felvétel (a használt mód): a motor 10°-onként lép és megáll, **minden megállásnál kézzel exponálunk**; 2 kör (≈20° és ≈45°), ~72 kép
+  - tartalék: kézi forgatás 10°-os jelekkel, vagy videó ~1 fordulat/perc
 - Jó tárgyak: matt, mintás, nem átlátszó
 
 ## 4. Szoftver

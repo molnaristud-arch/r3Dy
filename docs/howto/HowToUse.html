@@ -104,7 +104,8 @@
   <li><b>Android telefon</b> az ingyenes <b>Open Camera</b> alkalmazással, USB-kábel.</li>
   <li><b>Forgóasztal:</b> tányér vagy forgótálca, vagy egy áram nélküli PC-ventilátor mint csapágy.</li>
   <li><b>Nyomtatott korong</b> (<code>capture/disc_a4.svg</code>), fehér háttér (karton), egyenletes fény.</li>
-  <li><i>Opcionális:</i> Arduino Uno/Nano, 28BYJ-48 léptetőmotor ULN2003 panellel, piezo zümmer, nyomógomb.</li>
+  <li><b>Motoros forgóasztal:</b> Arduino Nano, 28BYJ-48 (5 V) léptetőmotor ULN2003 panellel – 10°-onként lép és megáll, a fotót kézzel készítjük.</li>
+  <li><b>Telefontartó</b> vagy állvány (akár könyvkupac): a telefon egy kör alatt nem mozdulhat.</li>
 </ul>
 </div>
 <div>
@@ -164,45 +165,44 @@ rm -rf data/teszt</pre>
 </section>
 
 <section class="page">
-<h2><span class="n">5</span>A telefon beállítása (Open Camera)</h2>
+<h2><span class="n">5</span>A telefon beállítása (Android: Open Camera · iPhone: Kamera)</h2>
 <table>
   <tr><th style="width:32%">beállítás</th><th>érték</th><th style="width:34%">miért</th></tr>
-  <tr><td>Felbontás</td><td>a legnagyobb; formátum <b>JPG</b> (nem HEIC)</td><td>a HEIC-et a szkript nem veszi észre</td></tr>
-  <tr><td>Fókusz</td><td>koppints a tárgyra, majd mód: <b>Locked</b></td><td>minden kép ugyanúgy éles</td></tr>
+  <tr><td>Felbontás</td><td>a legnagyobb; formátum <b>JPG</b> (iPhone: Beállítások → Kamera → Formátumok → Legkompatibilisebb)</td><td>a HEIC-et a szkript nem veszi észre</td></tr>
+  <tr><td>Fókusz</td><td>koppints a tárgyra, majd mód: <b>Locked</b> (iPhone: hosszan nyomva → „AE/AF ZÁR”)</td><td>minden kép ugyanúgy éles</td></tr>
   <tr><td>Expozíció</td><td><b>AE lock</b> (zárolt)</td><td>egyforma fényerő</td></tr>
   <tr><td>Fehéregyensúly</td><td>fix, pl. <b>Daylight</b></td><td>egyforma színek a textúrán</td></tr>
   <tr><td>HDR, vaku</td><td><b>ki</b></td><td>a feldolgozott képek torzítanak</td></tr>
-  <tr><td>Hangvezérlés (csak motorhoz)</td><td>Beállítások → Távvezérlés → Hangvezérlés → <b>Zaj</b>; a képernyőn koppints a mikrofon ikonra</td><td>a motor sípszavára exponál</td></tr>
+  <tr><td>Önkioldó (ajánlott)</td><td><b>2 s</b></td><td>az érintés rezgése nem mozdítja be a képet</td></tr>
 </table>
 <p>A telefont támaszd meg kb. 40–50 cm-re; a tárgy töltse ki a kép felét, a korong mintája is látsszon. <b>Egy körön belül ne mozdítsd el</b>, és ne váltogasd az álló/fekvő tájolást: a program a képek „fel” irányából állítja függőlegesbe a modellt.</p>
 
 <h2 style="margin-top:12pt"><span class="n">6</span>Felvétel: három lehetőség</h2>
-<p>Mindhárom esetben <b>két kör</b> kell: egy alacsonyról (kb. 20°-kal a tárgy fölül) és egy magasabbról (kb. 45°).</p>
+<p>Mindegyik esetben <b>két kör</b> kell: egy alacsonyról (kb. 20°-kal a tárgy fölül) és egy magasabbról (kb. 45°). A mi felállásunk a <b>B)</b>: a motor forgat, mi exponálunk.</p>
 
-<h3>A) Kézi léptetés – a legbiztosabb</h3>
-<p>Fotó → a tányért a következő 10°-os jelig forgatod → fotó … körönként <b>36 kép</b>, összesen 72. A kezed exponáláskor ne legyen a képen (a hangerőgomb is exponál). Kb. 4 perc körönként.</p>
+<h3>A) Kézi léptetés – ha nincs motor</h3>
+<p>Fotó → a tányért a következő 10°-os jelig forgatod → fotó … körönként <b>36 kép</b>. Kb. 4 perc körönként.</p>
 
-<h3>B) Arduino léptetőmotor – kéz nélkül</h3>
+<h3>B) Arduino léptetőmotor + kézi exponálás – a használt mód</h3>
 <div class="two">
 <div>
 <p><b>Bekötés:</b></p>
 <pre>ULN2003 IN1–IN4 → D8–D11
 ULN2003 + / -   → 5V / GND
-zümmer          → D7 és GND
-gomb            → D2 és GND</pre>
+gomb (opcionális) → D2 és GND</pre>
 <p><b>Feltöltés:</b> Arduino IDE → <code>capture/turntable_stepper/turntable_stepper.ino</code> → Board: Uno/Nano → Upload. Serial Monitor: 115200 baud, „Newline”.</p>
 </div>
 <div>
 <table>
   <tr><th>parancs</th><th>hatás</th></tr>
-  <tr><td><code>s</code> / gomb</td><td>36 megállás 10°-onként, mindegyiknél sípszó → a telefon exponál (~2 perc/kör)</td></tr>
+  <tr><td><code>s</code> / gomb</td><td>36 megállás 10°-onként; <b>minden megállásnál (<code>FOTO k/36</code>) egy fotó kézzel</b> (~2 perc/kör)</td></tr>
   <tr><td><code>c</code></td><td>folyamatos forgás (videóhoz), <code>r1.0</code> = RPM</td></tr>
   <tr><td><code>x</code> / gomb</td><td>stop</td></tr>
-  <tr><td><code>n36</code> <code>d2500</code> <code>b0</code> <code>?</code></td><td>megállások · állásidő (ms) · sípszó ki (<code>b1</code>: be) · állapot</td></tr>
+  <tr><td><code>n36</code> <code>d4000</code> <code>?</code></td><td>megállások · állásidő (ms; alap 2500, kényelmesebb 4000) · állapot</td></tr>
 </table>
 </div>
 </div>
-<p>Kör végén <code>KESZ</code>: emeld meg a telefont, és indítsd újra. 300 g fölötti tárgynál a tányér súlyát egy csapágy (pl. az áram nélküli ventilátor) vigye, a motor csak forgasson.</p>
+<p>Exponálás: a tányér megáll → fél másodperc → egy finom érintés (vagy hangerőgomb). Egy kihagyott vagy dupla kép nem baj. Kör végén <code>KESZ</code>: emeld meg a telefont, és indítsd újra. A tárgy legyen 300 g alatt.</p>
 
 <h3>C) Videó – a leggyorsabb</h3>
 <p>Videó módban, zárolt fókusszal és expozícióval; a tányér <b>lassan, folyamatosan</b> forog: <b>kb. 1 fordulat/perc</b> (kézzel vagy a motor <code>c</code> parancsával). Egy videóban két kör: a kettő között emeld meg a telefont, a felvétel mehet tovább. Gyorsabb forgásnál a képek elmosódnak – egy 300 RPM-es ventilátor motornak ezért nem jó.</p>
@@ -283,7 +283,7 @@ git add web/models &amp;&amp; git commit -m "Add: sportcipő" &amp;&amp; git pus
   <tr><td><code>[hiba] Nincs kapcsolat az API-val</code></td><td>nincs internet</td><td>tartalék: <code>./pipeline/auto.sh --no-ai</code></td></tr>
   <tr><td><code>"pushed": false</code></td><td>hálózat vagy git-jogosultság</td><td>a commit helyben megvan: később <code>git push</code></td></tr>
   <tr><td>a motor zúg, de nem forog</td><td>rossz tekercssorrend</td><td>IN1–IN4 pontosan D8–D11-re</td></tr>
-  <tr><td>a telefon nem exponál a sípszóra</td><td>hangvezérlés ki / halk</td><td>mikrofon ikon be, érzékenység fel, zümmer közelebb; vagy <code>d6000</code> és kézi exponálás</td></tr>
+  <tr><td>elmosódott vagy elcsúszott képek</td><td>az érintés megmozdítja a telefont</td><td>2 s-os önkioldó, <code>d4000</code>, hangerőgomb; a telefont rögzítsd jobban</td></tr>
 </table>
 <p><b>Ha semmi sem áll össze:</b> a tárgy álljon egy helyben, és te sétálj körülötte (~40 fotó). Ha így működik, a forgóasztal vagy a háttér a gond, nem a szoftver.</p>
 </section>
@@ -307,7 +307,7 @@ git add web/models &amp;&amp; git commit -m "Add: sportcipő" &amp;&amp; git pus
 <ol class="steps">
   <li>Laptop töltőn, böngésző zárva, <code>./setup.sh</code> → <code>setup ok</code>.</li>
   <li>Forgóasztal: korong középen, fehér háttér, egyenletes fény, a tárgy lemérve.</li>
-  <li>Telefon: Open Camera, minden zárolva, JPG, (motorhoz) hangvezérlés be.</li>
+  <li>Telefon rögzítve, fókusz és expozíció zárolva, JPG, 2 s-os önkioldó.</li>
   <li>Két kör fotó (kézzel, <code>s</code> paranccsal vagy videóval) → bemásolás a <code>data/bejovo/</code>-ba.</li>
   <li><code>.venv/bin/python agent/controller.py --inbox --size &lt;méret m&gt; --publish</code></li>
   <li>Amíg számol (10–20 perc): az ágens döntéseinek kommentálása, a korábbi modellek bemutatása, AR telefonon.</li>
