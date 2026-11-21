@@ -13,7 +13,7 @@
 #   ./pipeline/auto.sh --watch      # figyel, és minden új adagot feldolgoz (Ctrl+C: leállítás)
 # Kapcsolók:
 #   --frames 150   videóból összesen ennyi képkocka (több videónál elosztva; alap 150)
-#   --size 0.28    a tárgy leghosszabb mérete méterben (alap 0.2; utólag a cleanup újrafuttatható)
+#   --size 0.28    a tárgy leghosszabb mérete méterben – csak ha a korong nem található (alap 0.2)
 #   --mask         háttér kivágása a rekonstrukció előtt (zavaros háttérnél)
 #   --max 1600     max képméret (alap 2000; kisebb = gyorsabb, kevesebb VRAM)
 #   --settle 15    ennyi másodpercig nem változhat a bejovo/, mielőtt hozzányúl (másolás vége)
@@ -84,8 +84,14 @@ pipeline() {
     .venv/bin/python pipeline/mask.py "$dir/images" "$dir/masked"
   fi
   ./pipeline/reconstruct.sh "$dir" "$max"
-  echo "== Blender: tisztítás (--size $size m)"
-  ./blender/run.sh cleanup "$dir/model/model.obj" "$dir/model.glb" --size "$size" --blend
+  # Turntable scan: level on the printed disc, true scale from its diameter, cut it off.
+  # No disc found (e.g. masked photos) → fall back to the given --size.
+  echo "== Blender: tisztítás, korong levágása (méret a korongból)"
+  if ! ./blender/run.sh cleanup "$dir/model/model.obj" "$dir/model.glb" --remove-disc \
+       --disc-diameter "${DISC_DIAMETER_M:-0.19}" --blend; then
+    echo "== Nincs korong a modellen → tisztítás --size $size m-rel"
+    ./blender/run.sh cleanup "$dir/model/model.obj" "$dir/model.glb" --size "$size" --blend
+  fi
   echo "== előnézet"
   ./blender/run.sh preview "$dir/model.glb" "$dir/preview"
 }
