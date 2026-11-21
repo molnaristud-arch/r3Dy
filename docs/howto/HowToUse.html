@@ -112,7 +112,7 @@
 <h3>Szoftver (a telepítés feltelepíti)</h3>
 <ul>
   <li>COLMAP 4.2 és OpenMVS 2.4 (CUDA) – a 3D számítás.</li>
-  <li>Blender – tisztítás, méretezés, GLB-export.</li>
+  <li>Blender – tisztítás, a korong levágása, méretezés a korongból, GLB-export.</li>
   <li>Python-környezet (OpenCV, rembg) – videó, háttérkivágás.</li>
   <li>Git – a feltöltés a weboldalra egy <code>git push</code>.</li>
   <li><i>Opcionális:</i> Arduino IDE a motorhoz.</li>
@@ -158,7 +158,7 @@ rm -rf data/teszt</pre>
 <ol class="steps">
   <li><b>Korong:</b> nyomtasd ki a <code>capture/disc_a4.svg</code>-t <b>100 %-os („tényleges”) méretben</b>; a lap alján lévő skála vonalzóval mérve pontosan 5 cm legyen. Nagyobb tárgyhoz: <code>disc_a3.svg</code>.</li>
   <li><b>Alap:</b> ragaszd a korongot a tányérra, forgótálcára vagy a ventilátorra. Az asztalra a korong mellé tegyél egy szalagot: ez a fix jel a forgatáshoz.</li>
-  <li><b>Tárgy:</b> matt és mintás, 10–25 cm-es (cipő, plüss, festett figura, kő, fa). Kerüld: üveg, fém, fényes műanyag, egyszínű fehér tárgy, vékony szálak. Tedd a szaggatott kör közepére, és <b>mérd le a leghosszabb méretét</b>.</li>
+  <li><b>Tárgy:</b> matt és mintás, 10–25 cm-es (cipő, plüss, festett figura, kő, fa). Kerüld: üveg, fém, fényes műanyag, egyszínű fehér tárgy, vékony szálak. Tedd a szaggatott kör közepére. Lemérni nem kell: a méretet a program a 19 cm-es korongból számolja.</li>
   <li><b>Háttér: egyszínű</b> (fehér karton vagy üres fal). Ez fontos: a háttér áll, a tárgy forog – egy mintás háttér összezavarja a programot.</li>
   <li><b>Fény:</b> egyenletes, kemény árnyék nélkül (ablak felőli nappali fény vagy két lámpa két oldalról).</li>
 </ol>
@@ -210,9 +210,9 @@ gomb (opcionális) → D2 és GND</pre>
 
 <section class="page">
 <h2><span class="n">7</span>Feldolgozás: a vezérlő ágens</h2>
-<p>Másold a fotókat (vagy a videót) USB-n – a telefonon „Fájlátvitel” mód, <code>DCIM/OpenCamera</code> – a <b><code>data/bejovo/</code></b> mappába, majd indítsd az ágenst (a <code>--size</code> a tárgy leghosszabb mérete <b>méterben</b>):</p>
+<p>Másold a fotókat (vagy a videót) USB-n – a telefonon „Fájlátvitel” mód, <code>DCIM/OpenCamera</code> – a <b><code>data/bejovo/</code></b> mappába, majd indítsd az ágenst:</p>
 <pre>cd ~/r3Dy            <span class="c"># vagy ahová klónoztad</span>
-.venv/bin/python agent/controller.py --inbox --size 0.24</pre>
+.venv/bin/python agent/controller.py --inbox</pre>
 <p>Az ágens a képeket egy új <code>data/modell_N</code> mappába teszi, majd lépésről lépésre végigmegy a láncon. <b>Minden lépés után az eredményből dönt</b> – hány kép illeszkedett, milyen hiba jött, hogy néz ki a modell –, és ha kell, javít:</p>
 <pre>[vezérlő]   Döntés: 72 fotó van, indulhat a rekonstrukció 2000 px-en.
 [eszköz]    reconstruct({"max_image_size": 2000})
@@ -220,14 +220,17 @@ gomb (opcionális) → D2 és GND</pre>
 [vezérlő]   Döntés: csak 51/72 kép illeszkedett, a háttér zavarhat → háttérkivágás, újra.
 [eszköz]    mask_background({})
 …
+[eszköz]    cleanup_model({"size_m": 0.2, "remove_disc": true})
+[eredmény]  cleanup_model → {"disc_removed": true, "tilt_corrected_deg": 38.5, "object_size_cm": [6.2, 6.5, 1.0], …}
+…
 [eszköz]    quality_check({})
 [eredmény]  quality_check → {"nev": "Fehér sportcipő", "minoseg": "jo", …}
 <span class="ok">[kész]      KÉSZ (12 perc 30 s, 11 lépés)</span></pre>
-<p>72 fotónál a futás becslés szerint <b>8–20 perc</b>; közben a laptop legyen töltőn, a böngésző zárva.</p>
+<p><b>A korong levágása:</b> a Blender-lépés (<code>remove_disc</code>) megkeresi a korong síkját, ahhoz <b>vízszintezi</b> a modellt, a korong ismert <b>19 cm-es átmérőjéből valódi méretre skáláz</b>, majd levágja a korongot és ami alatta / körülötte van. Ezért kell, hogy a korong mintája a fotókon látsszon. 72 fotónál a futás kb. <b>8–20 perc</b>; közben a laptop legyen töltőn.</p>
 <table>
   <tr><th style="width:26%">kapcsoló</th><th>hatás</th></tr>
   <tr><td><code>--inbox</code></td><td>a <code>data/bejovo/</code> tartalmából új <code>data/modell_N</code> (helyette megadható egy meglévő mappa)</td></tr>
-  <tr><td><code>--size 0.24</code></td><td>a tárgy leghosszabb mérete méterben (nélküle 0.2, és az ágens jelzi)</td></tr>
+  <tr><td><code>--size 0.24</code></td><td>a tárgy leghosszabb mérete méterben – csak ha a korong nem használható (pl. nem látszik)</td></tr>
   <tr><td><code>--publish</code></td><td>engedélyezi a feltöltést a weboldalra (nélküle semmi nem kerül fel)</td></tr>
   <tr><td><code>--max-steps 30</code></td><td>legfeljebb ennyi eszközhívás</td></tr>
   <tr><td><code>--model</code> · <code>--effort</code></td><td>Claude-modell (alap: claude-opus-5-5) és gondolkodási szint (alap: high)</td></tr>
@@ -241,9 +244,9 @@ gomb (opcionális) → D2 és GND</pre>
 <pre>{"nev": "Fehér sportcipő",
  "leiras": "Fehér, bőr hatású sportcipő szürke talppal és fűzővel.",
  "cimkek": ["cipő", "ruházat"], "minoseg": "jo", "hibak": [], "javaslat": ""}</pre>
-<p><b>Minőség:</b> <b>jo</b> – mehet; <b>gyanus</b> – felismerhető, de hibás részekkel (lyuk, foltos textúra, tapadt háttér, dől) – a vezérlő megpróbálja javítani; <b>hibas</b> – érdemes újrafotózni. A hiányzó alj és a talp alatti korongdarab normális.</p>
+<p><b>Minőség:</b> <b>jo</b> – mehet; <b>gyanus</b> – felismerhető, de hibás részekkel (lyuk, foltos textúra, tapadt háttér, dől) – a vezérlő megpróbálja javítani; <b>hibas</b> – érdemes újrafotózni. A hiányzó vagy lapos alj és egy apró korongfolt a talp szélén normális.</p>
 <p>Ha a futás <code>--publish</code>-sel indult, a vezérlő a jó modellt feltölti: a weboldal mappájába másolja, commitol, pushol, és megvárja, amíg a modell megjelenik a <b>r3dy-web.vercel.app</b> oldalon (~20 s). Ha nem, később ugyanarra a mappára:</p>
-<pre>.venv/bin/python agent/controller.py data/modell_1 --size 0.24 --publish</pre>
+<pre>.venv/bin/python agent/controller.py data/modell_1 --publish</pre>
 <div class="note"><b>Tartalék lánc:</b> az <code>auto.sh</code> a végén ugyanettől az ágenstől kér javaslatot, és megkérdezi: <code>Feltöltsem így? [I/n, s = szerkesztés]</code> – Enter: feltöltés; n: nem; s: méret, név, címkék, leírás szerkesztése. Ha az AI nem érhető el, kézzel kérdez.</div>
 
 <h2 style="margin-top:12pt"><span class="n">9</span>A weboldal használata</h2>
@@ -264,12 +267,12 @@ gomb (opcionális) → D2 és GND</pre>
 <pre><span class="c"># fotók: data/cipo/images/   (videóból: .venv/bin/python pipeline/extract_frames.py video.mp4 data/cipo/images --count 150)</span>
 .venv/bin/python pipeline/mask.py data/cipo/images data/cipo/masked      <span class="c"># opcionális háttérkivágás</span>
 ./pipeline/reconstruct.sh data/cipo                                       <span class="c"># → data/cipo/model/model.obj</span>
-./blender/run.sh cleanup data/cipo/model/model.obj data/cipo/model.glb --size 0.28 --blend
+./blender/run.sh cleanup data/cipo/model/model.obj data/cipo/model.glb --remove-disc --blend   <span class="c"># korong le, méret a korongból</span>
 ./blender/run.sh preview data/cipo/model.glb data/cipo/preview
 .venv/bin/python agent/qa.py data/cipo                                    <span class="c"># minőségellenőrző ágens, JSON</span>
 .venv/bin/python pipeline/publish.py data/cipo/model.glb --name "Sportcipő" --tags cipő --description "…"
 git add web/models &amp;&amp; git commit -m "Add: sportcipő" &amp;&amp; git push         <span class="c"># élesítés ~20 s</span></pre>
-<p><b>Csak a méret rossz?</b> Elég a Blender-lépést újrafuttatni más <code>--size</code>-zal, majd újra feltölteni ugyanazzal a névvel.</p>
+<p><b>Levágás:</b> eltűnt az alj → <code>--cut-mm 0.5</code>, korongmaradék → <code>--cut-mm 2</code>; más korong: <code>--disc-diameter 0.25</code>; korong nélkül: <code>--size 0.28</code>.</p>
 
 <h2 style="margin-top:12pt"><span class="n">11</span>Hibaelhárítás</h2>
 <table>
@@ -309,7 +312,7 @@ git add web/models &amp;&amp; git commit -m "Add: sportcipő" &amp;&amp; git pus
   <li>Forgóasztal: korong középen, fehér háttér, egyenletes fény, a tárgy lemérve.</li>
   <li>Telefon rögzítve, fókusz és expozíció zárolva, JPG, 2 s-os önkioldó.</li>
   <li>Két kör fotó (kézzel, <code>s</code> paranccsal vagy videóval) → bemásolás a <code>data/bejovo/</code>-ba.</li>
-  <li><code>.venv/bin/python agent/controller.py --inbox --size &lt;méret m&gt; --publish</code></li>
+  <li><code>.venv/bin/python agent/controller.py --inbox --publish</code></li>
   <li>Amíg számol (10–20 perc): az ágens döntéseinek kommentálása, a korábbi modellek bemutatása, AR telefonon.</li>
   <li><code>[kész] KÉSZ</code> → frissítés az oldalon: ott az új modell.</li>
 </ol>
