@@ -13,11 +13,68 @@
 - Hardver: forgóasztal + mintás korong, fény, háttér, telefon állványon
 - Laptop: képkinyerés → (maszk) → rekonstrukció → Blender cleanup → előnézet → publikálás
 - Web: statikus oldal, `git push` = élesítés
-- Döntések:
-  - fotogrammetria (nem AI-modellezés)
-  - COLMAP + OpenMVS
-  - nincs felhőtárhely
-  - nincs backend
+### 2.1 Működés ágensekkel (vázlat)
+
+```
+   FOTÓZÁS                          FELDOLGOZÁS                                   WEB
+┌────────────┐  képek   ┌─────────────────────────────────────────────┐  push  ┌──────────┐
+│ forgóasztal│─────────▶│              VEZÉRLŐ ÁGENS                  │───────▶│ weboldal │
+│  + telefon │          │   (Claude: lépés → eredmény → döntés)       │        │ + ágens- │
+└─────▲──────┘          │                                             │        │  napló   │
+      │ „még 4 kép      │  eszközök:  extract_frames  mask            │        └──────────┘
+      │  felülről”      │             reconstruct     cleanup         │
+┌─────┴──────┐          │             preview         publish         │
+│ FOTÓZÁSI   │◀─képek───│                                             │
+│ SEGÍTŐ     │          │  szakértők:  ┌────────────────┐ ┌─────────┐ │
+└────────────┘          │              │ MINŐSÉG-       │ │ BLENDER │ │
+                        │              │ ELLENŐRZŐ      │ │ ÁGENS   │ │
+                        │              └───────┬────────┘ └────┬────┘ │
+                        │                ítélet│ + javaslat    │ javított GLB
+                        │                      ▼               ▼      │
+                        │              ┌────────────────────────────┐ │
+                        │              │ KURÁTOR: név, címkék, méret │ │
+                        │              └────────────────────────────┘ │
+                        └─────────────────────────────────────────────┘
+```
+
+**1. Fotózás:** a képek a `data/bejovo/`-be érkeznek; a fotózási segítő mindegyiket ellenőrzi, és visszaszól.
+```
+[segítő] 34/36 kép rendben. A 12. kép elmosódott, készíts helyette újat.
+[segítő] Gyors előzetes rekonstrukció: hiányzik a felülnézet 120–200° között.
+         → Emeld meg a telefont kb. 60°-ra, és fotózz még 4 képet.
+```
+
+**2. Feldolgozás:** a vezérlő minden lépés után dönt.
+```
+[vezérlő] reconstruct(max=2000) → 71/96 kép regisztrálva.
+[vezérlő] Döntés: a 25 kiesett kép nagy része háttérmintás. Újrapróbálom maszkolással.
+[vezérlő] mask() → reconstruct(max=2000) → 94/96 kép regisztrálva. ✓
+[vezérlő] cleanup(faces=50000) → preview()
+```
+
+**3. Minőségellenőrzés:** hiba esetén a vezérlő javíttat.
+```
+[minőség] Ítélet: GYANÚS. A modell kb. 15°-ban dől, a talp alatt korongdarab maradt.
+[vezérlő] Döntés: átadom a Blender ágensnek.
+[blender] Tájolás javítva, talp levágva z=0-nál.
+          Méretezés a korong 5 cm-es skálájából → 23,4 cm.
+[minőség] Ítélet: RENDBEN. ✓
+```
+
+**4. Közzététel:**
+```
+[kurátor] Név: „Festett fa madár” · Címkék: fa, figura, madár, kézműves
+[vezérlő] publish() → git push → ÉLES (18 s)
+```
+
+- **Demó:** bal oldalon az ágensek élő naplója, jobb oldalon a weboldal. Kulcsjelenet: egy szándékosan rossz szkennelést az ágens felismer és kijavít.
+- **Biztonsági háló:** minden döntésnek felső határa van (max. N újrapróbálkozás); ha az ágens elakad, a fix sorrendű `auto.sh` is lefuttatja a láncot.
+
+### 2.2 Döntések
+- fotogrammetria (nem AI-modellezés)
+- COLMAP + OpenMVS
+- nincs felhőtárhely
+- nincs backend
 
 ## 3. Hardver
 - [ ] Bevásárlólista: forgó alap, tányér, nyomtatott korong (100%), háttér, 2 lámpa + szóró, állvány, BT exponáló
